@@ -35,7 +35,7 @@ namespace GWCGreenpowerApp
             FilePath.TextChanged += OnFilePathChanged;
             AnalyseButton.Click += OnProcessFile;
 
-            comboBox1.ItemsSource = new Locationss();
+            //comboBox1.ItemsSource = new Locationss();
             comboBox1.SelectionChanged += OnLocationChanged;
         }
 
@@ -105,7 +105,7 @@ namespace GWCGreenpowerApp
 
         private void OnLocationChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (comboBox1.SelectedItem is string selectedLocation)
+            if (comboBox1.SelectedItem is ComboBoxItem item && item.Content is string selectedLocation)
             {
                 switch (selectedLocation)
                 {

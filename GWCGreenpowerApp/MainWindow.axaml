@@ -56,8 +56,12 @@
                     <ColumnDefinition Width="1*"/>
                 </Grid.ColumnDefinitions>
 
-                <ComboBox x:Name="comboBox1"
-                          Margin="10"/>
+                <ComboBox x:Name="comboBox1" Margin="10" SelectedIndex="0">
+                    <ComboBoxItem Content="Choose Location"/>
+                    <ComboBoxItem Content="Fife Cycle Track"/>
+                    <ComboBoxItem Content="Bo'ness"/>
+                    <ComboBoxItem Content="East Fortune"/>
+                </ComboBox>  
 
                 <TextBlock Grid.Column="1"
                            Text="Latitude:"

@@ -1,9 +1,103 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="GWCGreenpowerApp.MainWindow"
-        Title="GWCGreenpowerApp">
-    Welcome to Avalonia!
+        Title="GWCGreenpowerApp"
+        Width="800"
+        Height="450">
+
+    <Border Padding="10">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="40"/>
+            </Grid.RowDefinitions>
+
+            <!-- Bottom row: File selection -->
+            <Grid Grid.Row="2" Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0"
+                        x:Name="FileButton"
+                        Content="Choose File"
+                        Margin="10,0,0,0"/>
+
+                <TextBox Grid.Column="1"
+                         x:Name="FilePath"
+                         Text="Pick a file using the picker"
+                         VerticalAlignment="Center"
+                         Margin="10,0,10,0"/>
+
+                <Button Grid.Column="2"
+                        x:Name="AnalyseButton"
+                        Content="Analyse"
+                        Margin="0,0,10,0"
+                        HorizontalAlignment="Right"/>
+            </Grid>
+
+            <!-- Top row: Location and input fields -->
+            <Grid Grid.Row="0" Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="0.65*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="0.65*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="0.65*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+
+                <ComboBox x:Name="comboBox1"
+                          Margin="10"/>
+
+                <TextBlock Grid.Column="1"
+                           Text="Latitude:"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Right"/>
+
+                <TextBox Grid.Column="2"
+                         x:Name="latbox"
+                         VerticalAlignment="Center"
+                         Margin="2,0,10,0"/>
+
+                <TextBlock Grid.Column="3"
+                           Text="Longitude:"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Right"/>
+
+                <TextBox Grid.Column="4"
+                         x:Name="longibox"
+                         VerticalAlignment="Center"
+                         Margin="2,0,10,0"/>
+
+                <TextBlock Grid.Column="5"
+                           Text="Zoom:"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Right"/>
+
+                <TextBox Grid.Column="6"
+                         x:Name="zoombox"
+                         VerticalAlignment="Center"
+                         Margin="2,0,10,0"/>
+            </Grid>
+
+            <!-- Middle row: Map display -->
+            <Image Grid.Row="1"
+                   Grid.Column="1"
+                   x:Name="MapImage"
+                   Stretch="Uniform"
+                   Margin="10"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
+        </Grid>
+    </Border>
 </Window>

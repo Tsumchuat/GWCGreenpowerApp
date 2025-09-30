@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GWCGreenpowerApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4f70d326649d4e99a61d30a6ab5c5e11ce4399fd")]
 [assembly: System.Reflection.AssemblyProductAttribute("GWCGreenpowerApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GWCGreenpowerApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

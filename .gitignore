@@ -567,4 +567,5 @@ fabric.properties
 
 #custom ones i aded
 *.cache
-rider.project.restore.info
+rider.project.restore.info!/.idea/.idea.GWCGreenpowerApp/.idea/shelf/Uncommitted_changes_before_Update_at_01_10_2025,_11_31_\[Changes\]/GWCGreenpowerApp.AssemblyInfoInputs.cache
+!/.idea/.idea.GWCGreenpowerApp/.idea/shelf/Uncommitted_changes_before_Update_at_01_10_2025,_11_31_\[Changes\]/shelved.patch

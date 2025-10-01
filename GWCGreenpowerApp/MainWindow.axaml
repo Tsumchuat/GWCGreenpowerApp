@@ -95,13 +95,28 @@
             </Grid>
 
             <!-- Middle row: Map display -->
-            <Image Grid.Row="1"
-                   Grid.Column="1"
-                   x:Name="MapImage"
-                   Stretch="Uniform"
-                   Margin="10"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"/>
+            <ScrollViewer Grid.Row="1" Grid.Column="1" Margin="10"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Auto">
+                <ZoomBorder Name="ZoomBorder" Stretch="None" ZoomSpeed="1.2"
+                                ClipToBounds="True" Focusable="True"
+                                VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                    <Viewbox Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Grid>
+                            <!-- Image -->
+                            <Image x:Name="MapImage"
+                                   Stretch="None" />
+
+                            <!-- Overlay Canvas -->
+                            <Canvas x:Name="OverlayCanvas"
+                                    Width="{Binding #MapImage.Source.Size.Width}" 
+                                    Height="{Binding #MapImage.Source.Size.Height}"
+                                    IsHitTestVisible="False"/>
+                        </Grid>
+                    </Viewbox>
+                </ZoomBorder> 
+            </ScrollViewer>
+
         </Grid>
     </Border>
 </Window>

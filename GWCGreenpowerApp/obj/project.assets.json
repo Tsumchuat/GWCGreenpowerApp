@@ -499,6 +499,22 @@
           "lib/net5.0/MicroCom.Runtime.dll": {}
         }
       },
+      "PanAndZoom/11.3.6": {
+        "type": "package",
+        "dependencies": {
+          "Avalonia": "11.3.6"
+        },
+        "compile": {
+          "lib/net8.0/PanAndZoom.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/PanAndZoom.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "SkiaSharp/2.88.9": {
         "type": "package",
         "dependencies": {
@@ -1279,6 +1295,23 @@
         "microcom.runtime.nuspec"
       ]
     },
+    "PanAndZoom/11.3.6": {
+      "sha512": "6xsg4EcJgs1uYs1B2xyK/y4xwN4+jX32DPfPUSN2Sitozks8G5BqoPgw3C5ieBSif4i5KEZHuTZ82hmBhimYJA==",
+      "type": "package",
+      "path": "panandzoom/11.3.6",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net6.0/PanAndZoom.dll",
+        "lib/net6.0/PanAndZoom.xml",
+        "lib/net8.0/PanAndZoom.dll",
+        "lib/net8.0/PanAndZoom.xml",
+        "lib/netstandard2.0/PanAndZoom.dll",
+        "lib/netstandard2.0/PanAndZoom.xml",
+        "panandzoom.11.3.6.nupkg.sha512",
+        "panandzoom.nuspec"
+      ]
+    },
     "SkiaSharp/2.88.9": {
       "sha512": "3MD5VHjXXieSHCleRLuaTXmL2pD0mB7CcOB1x2kA1I4bhptf4e3R27iM93264ZYuAq6mkUyX5XbcxnZvMJYc1Q==",
       "type": "package",
@@ -1510,7 +1543,8 @@
       "Avalonia.Fonts.Inter >= 11.3.6",
       "Avalonia.Themes.Fluent >= 11.3.6",
       "CsvHelper >= 33.1.0",
-      "MessageBox.Avalonia >= 3.2.0"
+      "MessageBox.Avalonia >= 3.2.0",
+      "PanAndZoom >= 11.3.6"
     ]
   },
   "packageFolders": {
@@ -1583,6 +1617,10 @@
           "MessageBox.Avalonia": {
             "target": "Package",
             "version": "[3.2.0, )"
+          },
+          "PanAndZoom": {
+            "target": "Package",
+            "version": "[11.3.6, )"
           }
         },
         "imports": [

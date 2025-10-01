@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "FBGx4CYOXX4=",
+  "dgSpecHash": "IwA5abDcbdk=",
   "success": true,
   "projectFilePath": "/home/tsumchuat/RiderProjects/GWCGreenpowerApp/GWCGreenpowerApp/GWCGreenpowerApp.csproj",
   "expectedPackageFiles": [
@@ -28,6 +28,7 @@
     "/home/tsumchuat/.nuget/packages/harfbuzzsharp.nativeassets.win32/8.3.1.1/harfbuzzsharp.nativeassets.win32.8.3.1.1.nupkg.sha512",
     "/home/tsumchuat/.nuget/packages/messagebox.avalonia/3.2.0/messagebox.avalonia.3.2.0.nupkg.sha512",
     "/home/tsumchuat/.nuget/packages/microcom.runtime/0.11.0/microcom.runtime.0.11.0.nupkg.sha512",
+    "/home/tsumchuat/.nuget/packages/panandzoom/11.3.6/panandzoom.11.3.6.nupkg.sha512",
     "/home/tsumchuat/.nuget/packages/skiasharp/2.88.9/skiasharp.2.88.9.nupkg.sha512",
     "/home/tsumchuat/.nuget/packages/skiasharp.nativeassets.linux/2.88.9/skiasharp.nativeassets.linux.2.88.9.nupkg.sha512",
     "/home/tsumchuat/.nuget/packages/skiasharp.nativeassets.macos/2.88.9/skiasharp.nativeassets.macos.2.88.9.nupkg.sha512",

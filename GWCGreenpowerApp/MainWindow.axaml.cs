@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -10,11 +11,13 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
+using Path = System.IO.Path;
 
 namespace GWCGreenpowerApp
 {
@@ -87,8 +90,31 @@ namespace GWCGreenpowerApp
             if (File.Exists(filePath))
             {
                 MapImage.Source = new Bitmap(filePath);
-                // TODO: marker drawing – Avalonia doesn’t support DrawingVisual directly.
-                // You’d draw overlays using a Canvas or SkiaSharp.
+                OverlayCanvas.Children.Clear();
+
+                foreach (FileData record in records)
+                {
+                    var point = LatLonToPixel(
+                        record.Latitude,
+                        record.Longitude,
+                        latitude,
+                        longitude,
+                        zoom,
+                        (int)MapImage.Bounds.Width,
+                        (int)MapImage.Bounds.Height);
+                    
+                    var marker = new Ellipse
+                    {
+                        Width = 2,
+                        Height = 2,
+                        Fill = Brushes.Red
+                    };
+                    float xoffset = 320;
+                    float yoffset = 320;
+                    Canvas.SetLeft(marker, point.X - 1 + xoffset);
+                    Canvas.SetTop(marker, point.Y - 1 + yoffset);
+                    OverlayCanvas.Children.Add(marker);
+                }
             }
             else
             {
@@ -146,26 +172,60 @@ namespace GWCGreenpowerApp
             string filePath = Path.Combine(Path.GetTempPath(), "GWCGreenpowermap.png");
             await File.WriteAllBytesAsync(filePath, data);
         }
+        
+        static float MapSize(int zoom)
+        {
+            return 256f * (float)Math.Pow(2, zoom);
+            // Math.Pow only has double, so keep it there and cast result to float
+        }
+
+        static PointF LatLonToWorld(float lat, float lon, int zoom)
+        {
+            float latRad = lat * MathF.PI / 180f;
+            float mapSize = MapSize(zoom);
+
+            float x = (lon + 180f) / 360f * mapSize;
+            float y = (1f - MathF.Log(MathF.Tan(latRad) + 1f / MathF.Cos(latRad)) / MathF.PI) / 2f * mapSize;
+
+            return new PointF(x, y);
+        }
+
+        static PointF LatLonToPixel(float? latn, float? lonn,
+            float centerLat, float centerLon,
+            int zoom, int imgWidth, int imgHeight, int scale = 1)
+        {
+            if(latn == null || lonn == null)
+            {
+                return  new PointF(centerLat, centerLon);
+            }
+            float lat = (float)latn!;
+            float lon = (float)lonn!;
+            
+            var point = LatLonToWorld(lat, lon, zoom);
+            var center = LatLonToWorld(centerLat, centerLon, zoom);
+
+            int width = imgWidth * scale;
+            int height = imgHeight * scale;
+
+            float xMin = center.X - width / 2f;
+            float yMin = center.Y - height / 2f;
+
+            float px = point.X - xMin;
+            float py = point.Y - yMin;
+
+            return new PointF(px, py);
+        }
     }
 
     public class FileData
     {
-        public string BluetoothConnected { get; set; }
+        public string? BluetoothConnected { get; set; }
         [CsvHelper.Configuration.Attributes.Name("DateTime (date)")]
-        public string DateTime { get; set; }
+        public string? DateTime { get; set; }
         [CsvHelper.Configuration.Attributes.Name("GPS latitude (°)")]
-        public float Latitude { get; set; }
+        public float? Latitude { get; set; }
         [CsvHelper.Configuration.Attributes.Name("GPS longitude (°)")]
-        public float Longitude { get; set; }
+        public float? Longitude { get; set; }
     }
 
-    public class Locationss : ObservableCollection<string>
-    {
-        public Locationss()
-        {
-            Add("Fife Cycle Track");
-            Add("Bo'ness");
-            Add("East Fortune");
-        }
-    }
 }

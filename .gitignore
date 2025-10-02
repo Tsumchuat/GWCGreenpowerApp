@@ -1,1 +1,44 @@
-/GWCGreenpowerApp/obj/
+# --- .NET build outputs ---
+bin/
+obj/
+out/
+artifacts/
+
+# --- Avalonia generated resources ---
+*.g.cs
+*.g.i.cs
+*.resources
+*.axaml.cs  # only if auto-generated, keep the ones you write yourself
+
+# --- Rider / IntelliJ IDEA ---
+.idea/
+*.sln.iml
+*.iml
+
+# --- Visual Studio / VSCode junk ---
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+.vs/
+
+# --- NuGet ---
+*.nupkg
+*.snupkg
+project.lock.json
+project.assets.json
+project.nuget.cache
+project.packagespec.json
+*.nuspec
+packages/
+
+# --- Logs & caches ---
+*.log
+*.cache
+*.tmp
+*.restore.info
+
+# --- OS-specific ---
+.DS_Store
+Thumbs.db
+desktop.ini

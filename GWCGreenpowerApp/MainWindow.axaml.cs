@@ -28,21 +28,43 @@ namespace GWCGreenpowerApp
         float latitude = 0f;
         float longitude = 0f;
         int zoom = 17;
-
+        private int minLapDataCount = 30;
+        private List<Lap> fileLaps = new List<Lap>();
+        private int lapIndex = 0;
+        float xoffset = 320;
+        float yoffset = 320;
         public MainWindow()
         {
             InitializeComponent();
             
-            //ui setup
+            //ui events setup
             FileButton.Click += OnFileSelect;
             FilePath.TextChanged += OnFilePathChanged;
             AnalyseButton.Click += OnProcessFile;
-
-            //comboBox1.ItemsSource = new Locationss();
             comboBox1.SelectionChanged += OnLocationChanged;
+            LeftButton.Click += OnLeftButton;
+            RightButton.Click += OnRightButton;
         }
 
-        async void OnFileSelect(object sender, RoutedEventArgs e)
+        private void OnRightButton(object? sender, RoutedEventArgs e)
+        {
+            if (lapIndex < fileLaps.Count-1)
+            {
+                lapIndex++;
+                DisplayLap(fileLaps[lapIndex], lapIndex+1);
+            }
+        }
+
+        private void OnLeftButton(object? sender, RoutedEventArgs e)
+        {
+            if (lapIndex > 0)
+            {
+                lapIndex--;
+                DisplayLap(fileLaps[lapIndex], lapIndex+1);
+            }
+        }
+
+        async void OnFileSelect(object? sender, RoutedEventArgs e)
         {
             var dialog = new OpenFileDialog
             {
@@ -59,7 +81,7 @@ namespace GWCGreenpowerApp
             }
         }
 
-        async void OnProcessFile(object sender, RoutedEventArgs e)
+        async void OnProcessFile(object? sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(workingFile))
             {
@@ -87,11 +109,15 @@ namespace GWCGreenpowerApp
             await GenerateMap(latitude, longitude, zoom);
             string filePath = Path.Combine(Path.GetTempPath(), "GWCGreenpowermap.png");
 
-            if (File.Exists(filePath))
+            MapImage.Source = new Bitmap(filePath);
+            if (!File.Exists(filePath))
             {
-                MapImage.Source = new Bitmap(filePath);
-                OverlayCanvas.Children.Clear();
-
+                await MessageBoxManager
+                    .GetMessageBoxStandard("Error", "Map image not found.", ButtonEnum.Ok)
+                    .ShowAsync();
+                return;
+                
+                /*  OLD CODE (DISPLAYS ALL POINTS IN THE FILE IS ALSO WOULDNT WORK IN THIS IF STATEMENT ANYMORE)
                 foreach (FileData record in records)
                 {
                     var point = LatLonToPixel(
@@ -102,7 +128,7 @@ namespace GWCGreenpowerApp
                         zoom,
                         (int)MapImage.Bounds.Width,
                         (int)MapImage.Bounds.Height);
-                    
+
                     var marker = new Ellipse
                     {
                         Width = 2,
@@ -114,22 +140,21 @@ namespace GWCGreenpowerApp
                     Canvas.SetLeft(marker, point.X - 1 + xoffset);
                     Canvas.SetTop(marker, point.Y - 1 + yoffset);
                     OverlayCanvas.Children.Add(marker);
-                }
+
+                } */
             }
-            else
-            {
-                await MessageBoxManager
-                    .GetMessageBoxStandard("Error", "Map image not found.", ButtonEnum.Ok)
-                    .ShowAsync();
-            }
+            
+            fileLaps = FindLaps(records);
+            lapIndex = 0;
+            DisplayLap(fileLaps[lapIndex], lapIndex+1);
         }
 
-        private void OnFilePathChanged(object sender, TextChangedEventArgs e)
+        private void OnFilePathChanged(object? sender, TextChangedEventArgs e)
         {
             workingFile = FilePath.Text;
         }
 
-        private void OnLocationChanged(object sender, SelectionChangedEventArgs e)
+        private void OnLocationChanged(object? sender, SelectionChangedEventArgs e)
         {
             if (comboBox1.SelectedItem is ComboBoxItem item && item.Content is string selectedLocation)
             {
@@ -176,7 +201,6 @@ namespace GWCGreenpowerApp
         static float MapSize(int zoom)
         {
             return 256f * (float)Math.Pow(2, zoom);
-            // Math.Pow only has double, so keep it there and cast result to float
         }
 
         static PointF LatLonToWorld(float lat, float lon, int zoom)
@@ -192,7 +216,7 @@ namespace GWCGreenpowerApp
 
         static PointF LatLonToPixel(float? latn, float? lonn,
             float centerLat, float centerLon,
-            int zoom, int imgWidth, int imgHeight, int scale = 1)
+            int zoom)
         {
             if(latn == null || lonn == null)
             {
@@ -204,16 +228,109 @@ namespace GWCGreenpowerApp
             var point = LatLonToWorld(lat, lon, zoom);
             var center = LatLonToWorld(centerLat, centerLon, zoom);
 
-            int width = imgWidth * scale;
-            int height = imgHeight * scale;
-
-            float xMin = center.X - width / 2f;
-            float yMin = center.Y - height / 2f;
-
-            float px = point.X - xMin;
-            float py = point.Y - yMin;
+            float px = point.X - center.X ;
+            float py = point.Y - center.Y ;
 
             return new PointF(px, py);
+        }
+            
+        public List<Lap> FindLaps(List<FileData> records)
+        {
+            List<Lap> laps = new List<Lap>();
+            bool midLap = false;
+            Lap currentLap = new Lap();
+            foreach (FileData record in records)
+            {
+                if (midLap && record.BluetoothConnected != "1")
+                {
+                    midLap = false;
+                    laps.Add(currentLap);
+                    currentLap = new Lap();
+                }
+                else if (midLap)
+                {
+                    currentLap.Data.Add(record);
+                }
+                else if (!midLap && record.BluetoothConnected == "1")
+                {
+                    midLap = true;
+                    currentLap.Data.Add(record);
+                }
+
+                if (midLap && records.Last() == record)
+                {
+                    midLap = false;
+                    laps.Add(currentLap);
+                    currentLap = new Lap();
+                }
+            }
+
+            List<Lap> lapsToRemove = new List<Lap>();
+            foreach (Lap lap in laps)
+            {
+                if (lap.Data.Count <= minLapDataCount)
+                {
+                    lapsToRemove.Add(lap);
+                    continue;
+                }
+                
+                int gpsMoved = 0;
+                float lastLat = 0f;
+                float lastLon = 0f;
+                foreach (FileData record in lap.Data)
+                {
+                    if (lastLat != record.Latitude || lastLon != record.Longitude)
+                    {
+                        gpsMoved++;
+                    }
+
+                    lastLat = (float)record.Latitude;
+                    lastLon = (float)record.Longitude;
+                }
+
+                if (gpsMoved < 20)
+                {
+                    lapsToRemove.Add(lap);
+                    continue;
+                }
+
+                lap.MaxRPM = lap.Data.Max(d => d.RPM ?? 0);
+                
+            }
+
+            foreach (Lap lap in lapsToRemove)
+            {
+                laps.Remove(lap);
+            }
+            
+            return laps;
+        }
+
+        void DisplayLap(Lap lap, int lapNum)
+        {
+            OverlayCanvas.Children.Clear();
+            foreach (FileData record in lap.Data)
+            {
+                var point = LatLonToPixel(
+                    record.Latitude,
+                    record.Longitude,
+                    latitude,
+                    longitude,
+                    zoom);
+
+                var marker = new Ellipse
+                {
+                    Width = 2,
+                    Height = 2,
+                    Fill = Brushes.Red
+                };                 
+                
+                Canvas.SetLeft(marker, point.X - 1 + xoffset);
+                Canvas.SetTop(marker, point.Y - 1 + yoffset);
+                OverlayCanvas.Children.Add(marker);
+            }
+
+            LapNum.Text = "Lap Number: " + lapNum;
         }
     }
 
@@ -226,6 +343,19 @@ namespace GWCGreenpowerApp
         public float? Latitude { get; set; }
         [CsvHelper.Configuration.Attributes.Name("GPS longitude (°)")]
         public float? Longitude { get; set; }
+        [CsvHelper.Configuration.Attributes.Name("Motor speed (RPM)")]
+        public int? RPM { get; set; }
+    }
+
+    public class Lap
+    {
+        public List<FileData> Data { get; set; } = new List<FileData>();
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public float MaxSpeed { get; set; }
+        public int MaxRPM { get; set; }
+        public float MaxCurrent { get; set; }
+        public float MinVoltage { get; set; }
     }
 
 }

@@ -2,8 +2,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="GWCGreenpowerApp.MainWindow"
         Title="GWCGreenpowerApp"
-        Width="800"
-        Height="450">
+        Width="1280"
+        Height="720">
 
     <Border Padding="10">
         <Grid>
@@ -17,32 +17,6 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="40"/>
             </Grid.RowDefinitions>
-
-            <!-- Bottom row: File selection -->
-            <Grid Grid.Row="2" Grid.Column="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <Button Grid.Column="0"
-                        x:Name="FileButton"
-                        Content="Choose File"
-                        Margin="10,0,0,0"/>
-
-                <TextBox Grid.Column="1"
-                         x:Name="FilePath"
-                         Text="Pick a file using the picker"
-                         VerticalAlignment="Center"
-                         Margin="10,0,10,0"/>
-
-                <Button Grid.Column="2"
-                        x:Name="AnalyseButton"
-                        Content="Analyse"
-                        Margin="0,0,10,0"
-                        HorizontalAlignment="Right"/>
-            </Grid>
 
             <!-- Top row: Location and input fields -->
             <Grid Grid.Row="0" Grid.Column="1">
@@ -116,7 +90,57 @@
                     </Viewbox>
                 </ZoomBorder> 
             </ScrollViewer>
+            <Button Margin="10 0 0 0" Name="LeftButton" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Height="30" Width="30">
+                <PathIcon Data="m480-320 56-56-64-64h168v-80H472l64-64-56-56-160 160 160 160Zm0 240q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" Foreground="{DynamicResource ThemeForegroundBrush}" />
+            </Button>
+            <Button Margin="0 0 10 0" Name="RightButton" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Height="30" Width="30">
+                <PathIcon Data="m480-320 160-160-160-160-56 56 64 64H320v80h168l-64 64 56 56Zm0 240q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" Foreground="{DynamicResource ThemeForegroundBrush}" />
+            </Button>
+            
+            <!-- Bottom row: File selection -->
+            <Grid Grid.Row="2" Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
+                <Button Grid.Column="0"
+                        x:Name="FileButton"
+                        Content="Choose File"
+                        Margin="10,0,0,0"/>
+
+                <TextBox Grid.Column="1"
+                         x:Name="FilePath"
+                         Text="Pick a file using the picker"
+                         VerticalAlignment="Center"
+                         Margin="10,0,10,0"/>
+
+                <Button Grid.Column="2"
+                        x:Name="AnalyseButton"
+                        Content="Analyse"
+                        Margin="0,0,10,0"
+                        HorizontalAlignment="Right"/>
+            </Grid>
+            
+            <!-- Left Column -->
+            <ScrollViewer Grid.Row="1" Grid.Column="0" VerticalScrollBarVisibility="Auto">
+                <ItemsControl x:Name="DynamicElements">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <TextBlock Name="LapNum" TextAlignment="Right" Margin="5">Lap Number:</TextBlock>
+                    <TextBlock Name="LapStart" TextAlignment="Right" Margin="5">Lap Start: </TextBlock>
+                    <TextBlock Name="LapTime" TextAlignment="Right" Margin="5">Lap Time: </TextBlock>
+                    <TextBlock Name="MaxRPM" TextAlignment="Right" Margin="5">Max RPM: </TextBlock>
+                    <TextBlock Name="MaxSpeed" TextAlignment="Right" Margin="5">Max Speed: </TextBlock>
+                    <TextBlock Name="StartVolt" TextAlignment="Right" Margin="5">Starting Volt: </TextBlock>
+                    <TextBlock Name="VoltDrop" TextAlignment="Right" Margin="5">Voltage Drop: </TextBlock>
+                    <TextBlock Name="MaxCurrent" TextAlignment="Right" Margin="5">Max Current: </TextBlock>
+                </ItemsControl>
+            </ScrollViewer>
         </Grid>
     </Border>
 </Window>

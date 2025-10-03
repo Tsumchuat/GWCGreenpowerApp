@@ -120,7 +120,19 @@
                         x:Name="AnalyseButton"
                         Content="Analyse"
                         Margin="0,0,10,0"
-                        HorizontalAlignment="Right"/>
+                        HorizontalAlignment="Right">
+                    <!--Button.Flyout>
+                        <MenuFlyout>
+                            <MenuItem Header="East Fortune"/>
+                            <MenuItem Header="Fife Cycle Track"/>
+                            <MenuItem Header="Bo'ness"/>
+                            <MenuItem Header="-"/>
+                            <MenuItem Header="Custom"/>
+                            <MenuItem Header="-"/>
+                            <MenuItem Header="Close"/>        
+                        </MenuFlyout>
+                    </Button.Flyout-->
+                </Button>
             </Grid>
             
             <!-- Left Column -->
@@ -139,6 +151,8 @@
                     <TextBlock Name="StartVolt" TextAlignment="Right" Margin="5">Starting Volt: </TextBlock>
                     <TextBlock Name="VoltDrop" TextAlignment="Right" Margin="5">Voltage Drop: </TextBlock>
                     <TextBlock Name="MaxCurrent" TextAlignment="Right" Margin="5">Max Current: </TextBlock>
+                    <TextBlock Name="AvereageCurrent" TextAlignment="Right" Margin="5">Avg Current: </TextBlock>
+                    
                 </ItemsControl>
             </ScrollViewer>
         </Grid>

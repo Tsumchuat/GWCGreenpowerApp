@@ -44,6 +44,7 @@ namespace GWCGreenpowerApp
             comboBox1.SelectionChanged += OnLocationChanged;
             LeftButton.Click += OnLeftButton;
             RightButton.Click += OnRightButton;
+            
         }
 
         private void OnRightButton(object? sender, RoutedEventArgs e)
@@ -108,6 +109,7 @@ namespace GWCGreenpowerApp
 
             await GenerateMap(latitude, longitude, zoom);
             string filePath = Path.Combine(Path.GetTempPath(), "GWCGreenpowermap.png");
+            //TODO: fix the path so it uses an application path
 
             MapImage.Source = new Bitmap(filePath);
             if (!File.Exists(filePath))
@@ -116,32 +118,6 @@ namespace GWCGreenpowerApp
                     .GetMessageBoxStandard("Error", "Map image not found.", ButtonEnum.Ok)
                     .ShowAsync();
                 return;
-                
-                /*  OLD CODE (DISPLAYS ALL POINTS IN THE FILE IS ALSO WOULDNT WORK IN THIS IF STATEMENT ANYMORE)
-                foreach (FileData record in records)
-                {
-                    var point = LatLonToPixel(
-                        record.Latitude,
-                        record.Longitude,
-                        latitude,
-                        longitude,
-                        zoom,
-                        (int)MapImage.Bounds.Width,
-                        (int)MapImage.Bounds.Height);
-
-                    var marker = new Ellipse
-                    {
-                        Width = 2,
-                        Height = 2,
-                        Fill = Brushes.Red
-                    };
-                    float xoffset = 320;
-                    float yoffset = 320;
-                    Canvas.SetLeft(marker, point.X - 1 + xoffset);
-                    Canvas.SetTop(marker, point.Y - 1 + yoffset);
-                    OverlayCanvas.Children.Add(marker);
-
-                } */
             }
             
             fileLaps = FindLaps(records);
@@ -277,6 +253,8 @@ namespace GWCGreenpowerApp
                 int gpsMoved = 0;
                 float lastLat = 0f;
                 float lastLon = 0f;
+                string startTime = "";
+                bool startedLap = false;
                 foreach (FileData record in lap.Data)
                 {
                     if (lastLat != record.Latitude || lastLon != record.Longitude)
@@ -286,16 +264,32 @@ namespace GWCGreenpowerApp
 
                     lastLat = (float)record.Latitude;
                     lastLon = (float)record.Longitude;
-                }
 
+                    if (!startedLap && record.Current > 10)
+                    {
+                        startedLap = true;
+                        startTime = record.DateTime;
+                    }
+                }
+                
                 if (gpsMoved < 20)
                 {
                     lapsToRemove.Add(lap);
                     continue;
                 }
 
+                lap.StartTime = startTime;
                 lap.MaxRPM = lap.Data.Max(d => d.RPM ?? 0);
-                
+                lap.MaxSpeed = lap.Data.Max(d => d.Speed ?? 0);
+                lap.MaxCurrent = lap.Data.Max(d => d.Current ?? 0);
+                var filtered = lap.Data.Where(n => n.Current.HasValue && n.Current.Value != 0);
+                lap.AverageCurrent = filtered.Any() 
+                    ? MathF.Round(filtered.Average(n => n.Current.Value), 2) : 0f;
+
+
+                //   TODO  lap.StartVolt not implemented
+
+
             }
 
             foreach (Lap lap in lapsToRemove)
@@ -331,6 +325,15 @@ namespace GWCGreenpowerApp
             }
 
             LapNum.Text = "Lap Number: " + lapNum;
+            LapStart.Text = "Start Time: " +  lap.StartTime;
+            LapTime.Text = "Lap Time: I CBA";
+            MaxRPM.Text = "Max RPM: " + lap.MaxRPM;
+            MaxSpeed.Text = "Max Speed: " + lap.MaxSpeed;
+            StartVolt.Text = "Starting Volt: " + lap.StartVolt; //TODO calculate the starting voltage so voltage drop can also be calculated
+            VoltDrop.Text = "Volt Drop: " + lap.VoltDrop;
+            MaxCurrent.Text = "Max Current: " + lap.MaxCurrent;
+            AvereageCurrent.Text = "Avg Current: " + lap.AverageCurrent;
+
         }
     }
 
@@ -343,19 +346,26 @@ namespace GWCGreenpowerApp
         public float? Latitude { get; set; }
         [CsvHelper.Configuration.Attributes.Name("GPS longitude (°)")]
         public float? Longitude { get; set; }
+        [CsvHelper.Configuration.Attributes.Name("Current (A)")]
+        public float? Current { get; set; }
         [CsvHelper.Configuration.Attributes.Name("Motor speed (RPM)")]
         public int? RPM { get; set; }
+        [CsvHelper.Configuration.Attributes.Name("Speed (mph)")]
+        public float? Speed { get; set; }  
     }
 
     public class Lap
     {
+        //TODO calculate lap statistics dynamicaly for better code
         public List<FileData> Data { get; set; } = new List<FileData>();
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
+        public string StartTime { get; set; }
+        public string EndTime { get; set; }
         public float MaxSpeed { get; set; }
         public int MaxRPM { get; set; }
         public float MaxCurrent { get; set; }
-        public float MinVoltage { get; set; }
+        public float StartVolt { get; set; }
+        public float VoltDrop { get; set; }
+        public float AverageCurrent { get; set; }
     }
 
 }

@@ -1,0 +1,109 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="600"
+        Width="490" Height="640"
+        x:Class="GWCGreenpowerApp.Custom"
+        Title="Custom">
+        <Border Padding="10">
+                <Grid>
+                        <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <ScrollViewer>
+                        <ItemsControl>
+                                <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <TextBlock Margin="10">Custom Options</TextBlock>
+                                <!-- TODO ADD TEMPLATE OPTIONS FOR EXISTING TRACKS -->
+                                <!-- TODO ADD SAVING CUSTOM TRACKS -->
+                                <ScrollViewer>
+                                        <StackPanel>
+                                                <!-- Latitude -->
+                                                <Grid Margin="5">
+                                                        <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="Latitude"
+                                                                   VerticalAlignment="Center"
+                                                                   Margin="5"/>
+                                                        <TextBox Grid.Column="1"
+                                                                 x:Name="latBox"
+                                                                 VerticalAlignment="Center"
+                                                                 Margin="5"/>
+                                                </Grid>
+
+                                                <!-- Longitude -->
+                                                <Grid Margin="5">
+                                                        <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="Longitude"
+                                                                   VerticalAlignment="Center"
+                                                                   Margin="5"/>
+                                                        <TextBox Grid.Column="1"
+                                                                 x:Name="lonBox"
+                                                                 VerticalAlignment="Center"
+                                                                 Margin="5"/>
+                                                </Grid>
+
+                                                <!-- Zoom -->
+                                                <Grid Margin="5">
+                                                        <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="Zoom"
+                                                                   VerticalAlignment="Center"
+                                                                   Margin="5"/>
+                                                        <TextBox Grid.Column="1"
+                                                                 x:Name="zoomBox"
+                                                                 VerticalAlignment="Center"
+                                                                 Margin="5"/>
+                                                </Grid>
+                                                
+                                                <!-- File laps -->
+                                                <Grid Margin="5">
+                                                        <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="Use laps in file"
+                                                                   VerticalAlignment="Center"
+                                                                   Margin="5"/>
+                                                        <ToggleSwitch Grid.Column="1"
+                                                                      IsChecked="False"
+                                                                      HorizontalAlignment="Right"
+                                                                      Name="lapsSwitch"
+                                                                      OnContent="Will find in file" OffContent="Will Calcluate">
+                                                        </ToggleSwitch>
+                                                </Grid>
+                                        </StackPanel>
+                                </ScrollViewer>
+                        </ItemsControl>
+                        </ScrollViewer>
+                        
+                        <Grid VerticalAlignment="Bottom">
+                                <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <Button Grid.Column="0" Name="cancel" HorizontalAlignment="Stretch" Margin="10"><TextBlock HorizontalAlignment="Center">Cancel</TextBlock></Button>
+                                <Button Grid.Column="2" Name="save" HorizontalAlignment="Stretch" Margin="10"><TextBlock HorizontalAlignment="Center">Save</TextBlock></Button>
+                                <Button Grid.Column="3" Name="load" HorizontalAlignment="Stretch" Margin="10"><TextBlock HorizontalAlignment="Center">Load</TextBlock></Button>
+                                <Button Grid.Column="4" Name="analyse" HorizontalAlignment="Stretch" Margin="10"><TextBlock HorizontalAlignment="Center">Analyse</TextBlock></Button>
+                        </Grid>
+                </Grid>
+        </Border>
+</Window>

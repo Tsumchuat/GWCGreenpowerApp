@@ -27,7 +27,8 @@ namespace GWCGreenpowerApp
         static readonly HttpClient client = new HttpClient();
         float latitude = 0f;
         float longitude = 0f;
-        int zoom = 17;
+        private int zoom = 17;
+        bool lapInFile = false;
         private int minLapDataCount = 30;
         private List<Lap> fileLaps = new List<Lap>();
         private int lapIndex = 0;
@@ -40,8 +41,8 @@ namespace GWCGreenpowerApp
             //ui events setup
             FileButton.Click += OnFileSelect;
             FilePath.TextChanged += OnFilePathChanged;
-            AnalyseButton.Click += OnProcessFile;
-            comboBox1.SelectionChanged += OnLocationChanged;
+            //AnalyseButton.Click += OnProcessFile;
+        //    comboBox1.SelectionChanged += OnLocationChanged;
             LeftButton.Click += OnLeftButton;
             RightButton.Click += OnRightButton;
             
@@ -82,7 +83,7 @@ namespace GWCGreenpowerApp
             }
         }
 
-        async void OnProcessFile(object? sender, RoutedEventArgs e)
+        /*public async void ProcessFile()
         {
             if (string.IsNullOrEmpty(workingFile))
             {
@@ -123,14 +124,14 @@ namespace GWCGreenpowerApp
             fileLaps = FindLaps(records);
             lapIndex = 0;
             DisplayLap(fileLaps[lapIndex], lapIndex+1);
-        }
+        } */
 
         private void OnFilePathChanged(object? sender, TextChangedEventArgs e)
         {
             workingFile = FilePath.Text;
         }
 
-        private void OnLocationChanged(object? sender, SelectionChangedEventArgs e)
+      /*  private void OnLocationChanged(object? sender, SelectionChangedEventArgs e)
         {
             if (comboBox1.SelectedItem is ComboBoxItem item && item.Content is string selectedLocation)
             {
@@ -162,7 +163,7 @@ namespace GWCGreenpowerApp
                         break;
                 }
             }
-        }
+        } */
 
         static async Task GenerateMap(float lat, float longi, int zooms)
         {
@@ -326,7 +327,7 @@ namespace GWCGreenpowerApp
 
             LapNum.Text = "Lap Number: " + lapNum;
             LapStart.Text = "Start Time: " +  lap.StartTime;
-            LapTime.Text = "Lap Time: I CBA";
+            LapTime.Text = "Lap Time: ICBA";
             MaxRPM.Text = "Max RPM: " + lap.MaxRPM;
             MaxSpeed.Text = "Max Speed: " + lap.MaxSpeed;
             StartVolt.Text = "Starting Volt: " + lap.StartVolt; //TODO calculate the starting voltage so voltage drop can also be calculated
@@ -334,6 +335,81 @@ namespace GWCGreenpowerApp
             MaxCurrent.Text = "Max Current: " + lap.MaxCurrent;
             AvereageCurrent.Text = "Avg Current: " + lap.AverageCurrent;
 
+        }
+
+        //TODO move to file so values can be reused
+
+        private void OnBoness(object? sender, RoutedEventArgs e)
+        {
+            Analyse(56.008347f, -3.635709f, 19);
+        }
+        private void OnFifeCycle(object? sender, RoutedEventArgs e)
+        {
+            Analyse(56.140360f, -3.320650f, 17);
+        }
+        private void OnEastFortune(object? sender, RoutedEventArgs e)
+        {
+            Analyse(56.001370f, -2.708461f, 16);
+        }
+        
+        private async void OnCustom(object? sender, RoutedEventArgs e)
+        {
+            var customWindow = new Custom(this);
+            await customWindow.ShowDialog(this);
+        }
+
+        public async void Analyse(float _lat, float _lon, int _zoom, bool _lapInFile = false)
+        {
+            latitude = _lat;
+            longitude = _lon;
+            zoom = _zoom;
+            lapInFile = _lapInFile;
+            if (string.IsNullOrEmpty(workingFile))
+            {
+                await MessageBoxManager
+                    .GetMessageBoxStandard("No File Selected", "Please select a file first.", ButtonEnum.Ok)
+                    .ShowAsync();
+                return;
+            }
+            else if (workingFile.EndsWith("Pick a file using the picker"))
+            {
+                await MessageBoxManager
+                    .GetMessageBoxStandard("No File Selected", "Please select a file first.", ButtonEnum.Ok)
+                    .ShowAsync();
+                return;
+            }
+
+            var records = new List<FileData>();
+            try
+            {
+                using var reader = new StreamReader(workingFile);
+                using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+                records = csv.GetRecords<FileData>().ToList();
+            }
+            catch (Exception ex)
+            {
+                await MessageBoxManager
+                    .GetMessageBoxStandard("Error", $"File processing failed: {ex.Message}", ButtonEnum.Ok)
+                    .ShowAsync();
+                return;
+            }
+
+            await GenerateMap(latitude, longitude, zoom);
+            string filePath = Path.Combine(Path.GetTempPath(), "GWCGreenpowermap.png");
+            //TODO: fix the path so it uses an application path not just temp
+
+            MapImage.Source = new Bitmap(filePath);
+            if (!File.Exists(filePath))
+            {
+                await MessageBoxManager
+                    .GetMessageBoxStandard("Error", "Map image not found, please restart the app.", ButtonEnum.Ok)
+                    .ShowAsync();
+                return;
+            }
+            
+            fileLaps = FindLaps(records);
+            lapIndex = 0;
+            DisplayLap(fileLaps[lapIndex], lapIndex+1);
         }
     }
 

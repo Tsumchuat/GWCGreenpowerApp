@@ -13,13 +13,12 @@
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="40"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="40"/>
             </Grid.RowDefinitions>
 
             <!-- Top row: Location and input fields -->
-            <Grid Grid.Row="0" Grid.Column="1">
+            <!--Grid Grid.Row="0" Grid.Column="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="0.65*"/>
@@ -66,10 +65,10 @@
                          x:Name="zoombox"
                          VerticalAlignment="Center"
                          Margin="2,0,10,0"/>
-            </Grid>
+            </Grid-->
 
             <!-- Middle row: Map display -->
-            <ScrollViewer Grid.Row="1" Grid.Column="1" Margin="10"
+            <ScrollViewer Grid.Row="0" Grid.Column="1" Margin="10"
                           VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Auto">
                 <ZoomBorder Name="ZoomBorder" Stretch="None" ZoomSpeed="1.2"
@@ -90,15 +89,15 @@
                     </Viewbox>
                 </ZoomBorder> 
             </ScrollViewer>
-            <Button Margin="10 0 0 0" Name="LeftButton" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Height="30" Width="30">
+            <Button Margin="10 0 0 0" Name="LeftButton" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Height="30" Width="30">
                 <PathIcon Data="m480-320 56-56-64-64h168v-80H472l64-64-56-56-160 160 160 160Zm0 240q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" Foreground="{DynamicResource ThemeForegroundBrush}" />
             </Button>
-            <Button Margin="0 0 10 0" Name="RightButton" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Height="30" Width="30">
+            <Button Margin="0 0 10 0" Name="RightButton" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Height="30" Width="30">
                 <PathIcon Data="m480-320 160-160-160-160-56 56 64 64H320v80h168l-64 64 56 56Zm0 240q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" Foreground="{DynamicResource ThemeForegroundBrush}" />
             </Button>
             
             <!-- Bottom row: File selection -->
-            <Grid Grid.Row="2" Grid.Column="1">
+            <Grid Grid.Row="1" Grid.Column="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
@@ -121,22 +120,22 @@
                         Content="Analyse"
                         Margin="0,0,10,0"
                         HorizontalAlignment="Right">
-                    <!--Button.Flyout>
+                    <Button.Flyout>
                         <MenuFlyout>
-                            <MenuItem Header="East Fortune"/>
-                            <MenuItem Header="Fife Cycle Track"/>
-                            <MenuItem Header="Bo'ness"/>
+                            <MenuItem Header="East Fortune" Click="OnEastFortune"/>
+                            <MenuItem Header="Fife Cycle Track" Click="OnFifeCycle"/>
+                            <MenuItem Header="Bo'ness" Click="OnBoness"/>
                             <MenuItem Header="-"/>
-                            <MenuItem Header="Custom"/>
+                            <MenuItem Header="Custom" Click="OnCustom"/>
                             <MenuItem Header="-"/>
                             <MenuItem Header="Close"/>        
                         </MenuFlyout>
-                    </Button.Flyout-->
+                    </Button.Flyout>
                 </Button>
             </Grid>
             
             <!-- Left Column -->
-            <ScrollViewer Grid.Row="1" Grid.Column="0" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer Grid.Row="0" Grid.Column="0" VerticalScrollBarVisibility="Auto" Margin="0 30 0 10">
                 <ItemsControl x:Name="DynamicElements">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>

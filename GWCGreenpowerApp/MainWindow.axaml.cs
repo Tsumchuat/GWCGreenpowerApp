@@ -15,8 +15,8 @@ using Avalonia.Controls.Shapes;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using MessageBox.Avalonia;
-using MessageBox.Avalonia.Enums;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 using Path = System.IO.Path;
 
 namespace GWCGreenpowerApp
@@ -288,15 +288,15 @@ namespace GWCGreenpowerApp
             if (string.IsNullOrEmpty(workingFile))
             {
                 await MessageBoxManager
-                    .GetMessageBoxStandardWindow("No File Selected", "Please select a file first.", ButtonEnum.Ok)
-                    .Show();
+                    .GetMessageBoxStandard("No File Selected", "Please select a file first.", ButtonEnum.Ok)
+                    .ShowAsync();
                 return;
             }
             else if (workingFile.EndsWith("Pick a file using the picker"))
             {
                 await MessageBoxManager
-                    .GetMessageBoxStandardWindow("No File Selected", "Please select a file first.", ButtonEnum.Ok)
-                    .Show();
+                    .GetMessageBoxStandard("No File Selected", "Please select a file first.", ButtonEnum.Ok)
+                    .ShowAsync();
                 return;
             }
 
@@ -310,8 +310,8 @@ namespace GWCGreenpowerApp
             catch (Exception ex)
             {
                 await MessageBoxManager
-                    .GetMessageBoxStandardWindow("Error", $"File processing failed: {ex.Message}", ButtonEnum.Ok)
-                    .Show();
+                    .GetMessageBoxStandard("Error", $"File processing failed: {ex.Message}", ButtonEnum.Ok)
+                    .ShowAsync();
                 return;
             }
 
@@ -323,8 +323,8 @@ namespace GWCGreenpowerApp
             if (!File.Exists(filePath))
             {
                 await MessageBoxManager
-                    .GetMessageBoxStandardWindow("Error", "Map image not found, please restart the app.", ButtonEnum.Ok)
-                    .Show();
+                    .GetMessageBoxStandard("Error", "Map image not found, please restart the app.", ButtonEnum.Ok)
+                    .ShowAsync();
                 return;
             }
             

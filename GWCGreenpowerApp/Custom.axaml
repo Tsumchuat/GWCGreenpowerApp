@@ -32,7 +32,7 @@
                                                         </Grid.ColumnDefinitions>
                                                         <TextBlock Text="Latitude"
                                                                    VerticalAlignment="Center"
-                                                                   Margin="5"/>
+                                                                   Margin="5" />
                                                         <TextBox Grid.Column="1"
                                                                  x:Name="latBox"
                                                                  VerticalAlignment="Center"

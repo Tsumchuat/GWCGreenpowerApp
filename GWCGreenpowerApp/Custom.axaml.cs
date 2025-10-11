@@ -67,6 +67,7 @@ public partial class Custom : Window
     private void Analyse_Click(object? sender, RoutedEventArgs e)
     {
         _owner.Analyse(Convert.ToSingle(latBox.Text), Convert.ToSingle(lonBox.Text), Convert.ToInt32(zoomBox.Text), (bool)lapsSwitch.IsChecked);
+        _owner.location = new Location(){lat = Convert.ToSingle(latBox.Text), lon =Convert.ToSingle(lonBox.Text), zoom = Convert.ToInt32(zoomBox.Text), lapInFile = (bool)lapsSwitch.IsChecked};
         this.Close();
     }
 }

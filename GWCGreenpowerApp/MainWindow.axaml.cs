@@ -25,6 +25,7 @@ namespace GWCGreenpowerApp
     {
         public string workingFile;
         static readonly HttpClient client = new HttpClient();
+        public Location location;
         float latitude = 0f;
         float longitude = 0f;
         private int zoom = 17;
@@ -69,7 +70,7 @@ namespace GWCGreenpowerApp
             AnalyseButton.Flyout = flyout;
         }
         
-        private void OnLocationPicked(object? sender, RoutedEventArgs e)
+        private async void OnLocationPicked(object? sender, RoutedEventArgs e)
         {
             if (sender is MenuItem item)
             {
@@ -84,19 +85,15 @@ namespace GWCGreenpowerApp
                 }
                 else
                 {
-                    var locations = LocationManager.GetLocations().Result;
+                    var locations = await LocationManager.GetLocations();
                     var selectedLocation = locations.Find(loc => loc.name == locationName);
                     if (selectedLocation != null)
                     {
                         Analyse(selectedLocation.lat, selectedLocation.lon, selectedLocation.zoom, selectedLocation.lapInFile);
+                        location = selectedLocation;
                     }
                 }
             }
-        }
-
-        private void OnClick(object? sender, RoutedEventArgs e)
-        {
-            Console.WriteLine("IT WORKED I THINK");
         }
 
         private void OnRightButton(object? sender, RoutedEventArgs e)
@@ -188,33 +185,53 @@ namespace GWCGreenpowerApp
         public List<Lap> FindLaps(List<FileData> records)
         {
             List<Lap> laps = new List<Lap>();
-            bool midLap = false;
-            Lap currentLap = new Lap();
-            foreach (FileData record in records)
-            {
-                if (midLap && record.BluetoothConnected != "1")
-                {
-                    midLap = false;
-                    laps.Add(currentLap);
-                    currentLap = new Lap();
-                }
-                else if (midLap)
-                {
-                    currentLap.Data.Add(record);
-                }
-                else if (!midLap && record.BluetoothConnected == "1")
-                {
-                    midLap = true;
-                    currentLap.Data.Add(record);
-                }
 
-                if (midLap && records.Last() == record)
+            if (!location.lapInFile)
+            {
+                bool midLap = false;
+                Lap currentLap = new Lap();
+                foreach (FileData record in records)
                 {
-                    midLap = false;
-                    laps.Add(currentLap);
-                    currentLap = new Lap();
+                    if (midLap && record.BluetoothConnected != "1")
+                    {
+                        midLap = false;
+                        laps.Add(currentLap);
+                        currentLap = new Lap();
+                    }
+                    else if (midLap)
+                    {
+                        currentLap.Data.Add(record);
+                    }
+                    else if (!midLap && record.BluetoothConnected == "1")
+                    {
+                        midLap = true;
+                        currentLap.Data.Add(record);
+                    }
+
+                    if (midLap && records.Last() == record)
+                    {
+                        midLap = false;
+                        laps.Add(currentLap);
+                        currentLap = new Lap();
+                    }
                 }
             }
+            else
+            {
+                int lastLapNumber = 0;
+                Lap currentLap = new Lap();
+                foreach (FileData record in records)
+                {
+                    if (record.FileLap > lastLapNumber)
+                    {
+                        laps.Add(currentLap);
+                        currentLap = new Lap();
+                    }
+                    lastLapNumber = record.FileLap ?? 0;
+                    currentLap.Data.Add(record);
+                }
+            }
+            
 
             List<Lap> lapsToRemove = new List<Lap>();
             foreach (Lap lap in laps)
@@ -237,13 +254,12 @@ namespace GWCGreenpowerApp
                         gpsMoved++;
                     }
 
-                    lastLat = (float)record.Latitude;
-                    lastLon = (float)record.Longitude;
-
+                    lastLat = record.Latitude ?? 0f;
+                    lastLon = record.Longitude ?? 0f;
                     if (!startedLap && record.Current > 10)
                     {
                         startedLap = true;
-                        startTime = record.DateTime;
+                        startTime = record.DateTime ?? "";
                     }
                 }
                 
@@ -394,6 +410,8 @@ namespace GWCGreenpowerApp
         public int? RPM { get; set; }
         [CsvHelper.Configuration.Attributes.Name("Speed (mph)")]
         public float? Speed { get; set; }  
+        [CsvHelper.Configuration.Attributes.Name("Lap")]
+        public int? FileLap { get; set; }
     }
 
     public class Lap

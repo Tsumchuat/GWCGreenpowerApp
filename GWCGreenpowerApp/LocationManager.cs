@@ -4,6 +4,9 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 
@@ -12,16 +15,23 @@ namespace GWCGreenpowerApp;
 
 public class LocationManager
 {
-    
+    public static MainWindow? mainWindow = (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow as MainWindow;
+
     public static async void SaveLocation(Location location)
     {
         List<Location> locations = await GetLocations();
+        List<Location> toRemove = new();
         foreach (Location x in locations)
         {
             if (location.name == x.name)
             {
-                locations.Remove(x);
+                toRemove.Add(x);
             }
+        }
+
+        foreach (Location loc in toRemove)
+        {
+            locations.Remove(loc);
         }
         
         locations.Add(location);
@@ -43,6 +53,8 @@ public class LocationManager
                 .GetMessageBoxStandard("Error Saving location", ex.Message, ButtonEnum.Ok)
                 .ShowAsync();
         }
+
+        mainWindow?.UpdateMenuLocations();
     }
     
     public async static Task<List<Location>> GetLocations()
@@ -77,14 +89,16 @@ public class LocationManager
             }
             else
             {
-                Console.WriteLine("No saved locations found.");
-                return new List<Location>();
+                string temPath = Path.Combine(folder, "locations.json.default");
+                File.Copy(@temPath, @filePath, true);
+                return await GetLocations();
             }
         }
         else
         {
-            Console.WriteLine("No saved locations found.");
-            return new List<Location>();
+            string temPath = Path.Combine(folder, "locations.json.default");
+            File.Copy(@temPath, @filePath, true);
+            return await GetLocations();
         }
 
     }

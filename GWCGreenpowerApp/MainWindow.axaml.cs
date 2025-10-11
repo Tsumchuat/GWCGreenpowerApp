@@ -44,8 +44,59 @@ namespace GWCGreenpowerApp
             FilePath.TextChanged += OnFilePathChanged;
             LeftButton.Click += OnLeftButton;
             RightButton.Click += OnRightButton;
-            LocationManager locationManager = new LocationManager();
+
+            UpdateMenuLocations();
+        }
+
+        public async void UpdateMenuLocations()
+        {
+            List<Location> menuLocations = new List<Location>( await LocationManager.GetLocations());
+
+            menuLocations.Add(new Location() { name = "-" });
+            menuLocations.Add(new Location() { name = "Custom" });
+            menuLocations.Add(new Location() { name = "-" });
+            menuLocations.Add(new Location() { name = "Close" });
             
+            var flyout = new MenuFlyout();
+
+            foreach (var location in menuLocations)
+            {
+                var item = new MenuItem { Header = location.name };
+                item.Click += OnLocationPicked;
+                flyout.Items.Add(item);
+            }
+            
+            AnalyseButton.Flyout = flyout;
+        }
+        
+        private void OnLocationPicked(object? sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem item)
+            {
+                string locationName = item.Header.ToString() ?? "";
+                if (locationName == "Close" || locationName == "-")
+                {
+                    return;
+                }
+                if (locationName == "Custom")
+                {
+                    CustomLocation();
+                }
+                else
+                {
+                    var locations = LocationManager.GetLocations().Result;
+                    var selectedLocation = locations.Find(loc => loc.name == locationName);
+                    if (selectedLocation != null)
+                    {
+                        Analyse(selectedLocation.lat, selectedLocation.lon, selectedLocation.zoom, selectedLocation.lapInFile);
+                    }
+                }
+            }
+        }
+
+        private void OnClick(object? sender, RoutedEventArgs e)
+        {
+            Console.WriteLine("IT WORKED I THINK");
         }
 
         private void OnRightButton(object? sender, RoutedEventArgs e)
@@ -259,21 +310,10 @@ namespace GWCGreenpowerApp
             AvereageCurrent.Text = "Avg Current: " + lap.AverageCurrent;
 
         }
+
         
-        private void OnBoness(object? sender, RoutedEventArgs e)
-        {
-            Analyse(56.008347f, -3.635709f, 19);
-        }
-        private void OnFifeCycle(object? sender, RoutedEventArgs e)
-        {
-            Analyse(56.140360f, -3.320650f, 17);
-        }
-        private void OnEastFortune(object? sender, RoutedEventArgs e)
-        {
-            Analyse(56.001370f, -2.708461f, 16);
-        }
         
-        private async void OnCustom(object? sender, RoutedEventArgs e)
+        private async void CustomLocation()
         {
             var customWindow = new Custom(this);
             await customWindow.ShowDialog(this);
@@ -331,6 +371,11 @@ namespace GWCGreenpowerApp
             fileLaps = FindLaps(records);
             lapIndex = 0;
             DisplayLap(fileLaps[lapIndex], lapIndex+1);
+        }
+        
+        private void AddDynamicMenuItem(string name, EventHandler<RoutedEventArgs> onClick)
+        {
+            
         }
     }
 

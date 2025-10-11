@@ -17,5 +17,6 @@ class Program
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .WithInterFont()
-            .LogToTrace();
+            .LogToTrace()
+            .LogToTrace(Avalonia.Logging.LogEventLevel.Information) ;
 }

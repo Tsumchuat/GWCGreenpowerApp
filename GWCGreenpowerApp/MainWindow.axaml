@@ -1,6 +1,8 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:GWCGreenpowerApp"
         x:Class="GWCGreenpowerApp.MainWindow"
+        x:CompileBindings="False"
         Title="GWCGreenpowerApp"
         Width="1280"
         Height="720">
@@ -121,15 +123,7 @@
                         Margin="0,0,10,0"
                         HorizontalAlignment="Right">
                     <Button.Flyout>
-                        <MenuFlyout>
-                            <MenuItem Header="East Fortune" Click="OnEastFortune"/>
-                            <MenuItem Header="Fife Cycle Track" Click="OnFifeCycle"/>
-                            <MenuItem Header="Bo'ness" Click="OnBoness"/>
-                            <MenuItem Header="-"/>
-                            <MenuItem Header="Custom" Click="OnCustom"/>
-                            <MenuItem Header="-"/>
-                            <MenuItem Header="Close"/>        
-                        </MenuFlyout>
+                        <MenuFlyout/>
                     </Button.Flyout>
                 </Button>
             </Grid>

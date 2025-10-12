@@ -25,7 +25,7 @@ public partial class Custom : Window
 
     private void Cancel_Click(object? sender, RoutedEventArgs e)
     {
-        throw new System.NotImplementedException();
+        
     }
 
     private async void Save_Click(object? sender, RoutedEventArgs e)

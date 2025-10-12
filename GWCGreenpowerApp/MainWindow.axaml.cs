@@ -33,8 +33,8 @@ namespace GWCGreenpowerApp
         private int minLapDataCount = 30;
         private List<Lap> fileLaps = new List<Lap>();
         private int lapIndex = 0;
-        float xoffset = 320;
-        float yoffset = 320;
+        private float xoffset = 640;
+        private float yoffset = 640;
         
         public MainWindow()
         {
@@ -133,16 +133,16 @@ namespace GWCGreenpowerApp
 
         private void OnFilePathChanged(object? sender, TextChangedEventArgs e)
         {
-            workingFile = FilePath.Text;
+            workingFile = FilePath.Text ?? "";
         }
         
         static async Task GenerateMap(float lat, float longi, int zooms)
         {
-            string url = $"https://maps.googleapis.com/maps/api/staticmap?center={lat},{longi}&zoom={zooms}&size=640x640&maptype=satellite&key=AIzaSyBTL-v9AZuWE66IECeZfcsbU07AAG-1FYc";
+            string url = $"https://maps.googleapis.com/maps/api/staticmap?center={lat},{longi}&zoom={zooms}&size=640x640&maptype=satellite&scale=2&key=AIzaSyBTL-v9AZuWE66IECeZfcsbU07AAG-1FYc";
             using HttpResponseMessage response = await client.GetAsync(url);
             response.EnsureSuccessStatusCode();
             byte[] data = await response.Content.ReadAsByteArrayAsync();
-            string filePath = Path.Combine(Path.GetTempPath(), "GWCGreenpowermap.png");
+            string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GWCGreenpowerApp", "GWCGreenpowermap.png");
             await File.WriteAllBytesAsync(filePath, data);
         }
         
@@ -176,8 +176,8 @@ namespace GWCGreenpowerApp
             var point = LatLonToWorld(lat, lon, zoom);
             var center = LatLonToWorld(centerLat, centerLon, zoom);
 
-            float px = point.X - center.X ;
-            float py = point.Y - center.Y ;
+            float px = (point.X - center.X) * 2 ; //*2 for scale=2
+            float py = (point.Y - center.Y) * 2 ;
 
             return new PointF(px, py);
         }
@@ -372,8 +372,7 @@ namespace GWCGreenpowerApp
             }
 
             await GenerateMap(latitude, longitude, zoom);
-            string filePath = Path.Combine(Path.GetTempPath(), "GWCGreenpowermap.png");
-            //TODO: fix the path so it uses an application path not just temp
+            string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GWCGreenpowerApp", "GWCGreenpowermap.png");
 
             MapImage.Source = new Bitmap(filePath);
             if (!File.Exists(filePath))
@@ -416,7 +415,7 @@ namespace GWCGreenpowerApp
 
     public class Lap
     {
-        //TODO calculate lap statistics dynamicaly for better code but a variable isnt that bad forever
+        //TODO calculate lap statistics dynamicaly for better code but a variable isnt that bad forever like just leave it why bother cause i know later you is fucking lazy
         public List<FileData> Data { get; set; } = new List<FileData>();
         public string StartTime { get; set; }
         public string EndTime { get; set; }

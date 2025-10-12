@@ -21,7 +21,6 @@
                                 </ItemsControl.ItemsPanel>
                                 <TextBlock Margin="10">Custom Options</TextBlock>
                                 <!-- TODO ADD TEMPLATE OPTIONS FOR EXISTING TRACKS -->
-                                <!-- TODO ADD SAVING CUSTOM TRACKS -->
                                 <ScrollViewer>
                                         <StackPanel>
                                                 <!-- Latitude -->

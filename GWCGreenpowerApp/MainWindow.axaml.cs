@@ -35,11 +35,11 @@ namespace GWCGreenpowerApp
         private int lapIndex = 0;
         private float xoffset = 640;
         private float yoffset = 640;
-        
+
         public MainWindow()
         {
             InitializeComponent();
-            
+
             //ui events setup
             FileButton.Click += OnFileSelect;
             FilePath.TextChanged += OnFilePathChanged;
@@ -176,7 +176,7 @@ namespace GWCGreenpowerApp
             var point = LatLonToWorld(lat, lon, zoom);
             var center = LatLonToWorld(centerLat, centerLon, zoom);
 
-            float px = (point.X - center.X) * 2 ; //*2 for scale=2
+            float px = (point.X - center.X) * 2 ; //   *2 for scale=2
             float py = (point.Y - center.Y) * 2 ;
 
             return new PointF(px, py);

@@ -296,10 +296,11 @@ namespace GWCGreenpowerApp
                 lap.EstimatedTime = (endTime - startTime) - new TimeSpan(0, 0, 0, 0, 900); //subtract time to account for human delay after crossing the line
                 if (location.lapInFile)
                 {
-                    lap.LapTime = lap.EstimatedTime.TotalSeconds.ToString(); //TODO fetch speedhive for greenpower and match if u cba
+                    lap.EstimatedTime = (endTime - startTime); // redo the estimated time without subtracting if they laps are in the file
+                    lap.LapTime = Math.Round(lap.EstimatedTime.TotalSeconds, 2).ToString(); //TODO fetch speedhive for greenpower and match if u cba
                 }
-                else if (hasResultsLink)  //TODO see what happens if no results are found in the timeframe ect
-                {
+                else if (hasResultsLink)  //TODO see what happens if no results are found in the timeframe  
+                { //writen by ai i dont fully get to sorry future me
                     var filtered = resultEntries
                         .Select(r =>
                         {

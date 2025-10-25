@@ -331,7 +331,7 @@ namespace GWCGreenpowerApp
                     lap.LapTime = Math.Round(lap.EstimatedTime.TotalSeconds, 2).ToString();
                 }
 
-                lap.MaxRPM = lap.Data.Max(d => d.RPM ?? 0);
+                lap.MaxRPM = lap.Data.Max(d => d.RPM ?? 0);  //Filter out stupid values maybe by checking the ones around it idk 
                 lap.MaxSpeed = lap.Data.Max(d => d.Speed ?? 0);
                 lap.MaxCurrent = lap.Data.Max(d => d.Current ?? 0);
                 var filteredx = lap.Data.Where(n => n.Current.HasValue && n.Current.Value != 0);

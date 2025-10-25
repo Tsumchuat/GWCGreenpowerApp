@@ -1,0 +1,35 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:GWCGreenpowerApp"
+        x:Class="GWCGreenpowerApp.AnalysePopup"
+        x:CompileBindings="False"
+        Title="GWCGreenpowerApp"
+        Width="640"
+        Height="480">
+
+    <Border Padding="10">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="40"/>
+            </Grid.RowDefinitions>
+            
+            <TextBox Grid.Row="0"
+                     x:Name="ResultsURL"
+                     Watermark="Enter a URL from Resultsman.co.uk to match lap times (optional)"
+                     VerticalAlignment="Center"/>
+            
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                                
+                <Button Grid.Column="0" Name="cancel" Click="OnCancel" HorizontalAlignment="Left"><TextBlock HorizontalAlignment="Center">Cancel</TextBlock></Button>
+                <Button Grid.Column="2" Name="analyse" Click="OnAnalyse" HorizontalAlignment="Right"><TextBlock HorizontalAlignment="Center">Analyse</TextBlock></Button>
+            </Grid>
+            
+        </Grid>
+    </Border>
+</Window>

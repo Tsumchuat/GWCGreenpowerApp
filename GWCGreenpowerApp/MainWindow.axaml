@@ -10,7 +10,7 @@
     <Border Padding="10">
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="500"/> <!-- TODO make this auto size or a grab handle -->
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
@@ -113,7 +113,7 @@
 
                 <TextBox Grid.Column="1"
                          x:Name="FilePath"
-                         Text="Pick a file using the picker"
+                         Watermark="Pick a file using the picker"
                          VerticalAlignment="Center"
                          Margin="10,0,10,0"/>
 
@@ -145,6 +145,7 @@
                     <TextBlock Name="VoltDrop" TextAlignment="Right" Margin="5">Voltage Drop: </TextBlock>
                     <TextBlock Name="MaxCurrent" TextAlignment="Right" Margin="5">Max Current: </TextBlock>
                     <TextBlock Name="AvereageCurrent" TextAlignment="Right" Margin="5">Avg Current: </TextBlock>
+                    <TextBlock Name="ID" TextAlignment="Right" Margin="5">Lap Debug ID: </TextBlock>
                     
                 </ItemsControl>
             </ScrollViewer>

@@ -82,37 +82,68 @@ namespace GWCGreenpowerApp
     {
         try
         {
-            var html = await client.GetStringAsync(competitorUrl);
-            var doc = new HtmlDocument();
-            doc.LoadHtml(html);
-            // Find all lap divs that have both a time (HH:mm) and a float number
-            var a = doc.DocumentNode.SelectNodes("//div[contains(@class,'bg1')]");
-            var b = doc.DocumentNode.SelectNodes("//div[contains(@class,'bg2')]");
-            var lapDivs = (a ?? Enumerable.Empty<HtmlNode>()).Concat(b ?? Enumerable.Empty<HtmlNode>());
-
-            foreach (var lap in lapDivs)
+            const int maxRetries = 2;
+            int retries = 0;
+        
+            while (true)
             {
-                var timeNode = lap.SelectSingleNode(".//div[contains(@style,'left:10px')]");
-                var lapTimeNode = lap.SelectSingleNode(".//div[contains(@style,'left:50%')]");
-
-                if (timeNode == null || lapTimeNode == null)
-                    continue;
-
-                var startTime = timeNode.InnerText.Trim();
-                var lapText = lapTimeNode.InnerText.Trim();
-
-                if (float.TryParse(lapText, out var lapVal))
+                try
                 {
-                    // match times with a tolerance
-                    if (Math.Abs(lapVal - lapTime) < 0.05f)
-                        return startTime;
+                    var html = await client.GetStringAsync(competitorUrl);
+                    var doc = new HtmlAgilityPack.HtmlDocument();
+                    doc.LoadHtml(html);
+        
+                    // Find all lap divs that have both a time (HH:mm) and a float number
+                    var a = doc.DocumentNode.SelectNodes("//div[contains(@class,'bg1')]");
+                    var b = doc.DocumentNode.SelectNodes("//div[contains(@class,'bg2')]");
+                    var lapDivs = (a ?? Enumerable.Empty<HtmlNode>()).Concat(b ?? Enumerable.Empty<HtmlNode>());
+        
+                    foreach (var lap in lapDivs)
+                    {
+                        var timeNode = lap.SelectSingleNode(".//div[contains(@style,'left:10px')]");
+                        var lapTimeNode = lap.SelectSingleNode(".//div[contains(@style,'left:50%')]");
+        
+                        if (timeNode == null || lapTimeNode == null)
+                            continue;
+        
+                        var startTime = timeNode.InnerText.Trim();
+                        var lapText = lapTimeNode.InnerText.Trim();
+        
+                        if (float.TryParse(lapText, out var lapVal))
+                        {
+                            // match times with a tolerance
+                            if (Math.Abs(lapVal - lapTime) < 0.05f)
+                                return startTime;
+                        }
+                    }
+        
+                    break; // success, exit the retry loop
+                }
+                catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+                {
+                    retries++;
+                    Console.WriteLine($"Error 500 fetching {competitorUrl}, retry {retries}/{maxRetries}...");
+        
+                    if (retries > maxRetries)
+                    {
+                        Console.WriteLine($"Giving up on {competitorUrl} after {maxRetries + 1} attempts.");
+                        break;
+                    }
+        
+                    await Task.Delay(1000); // optional small delay before retry
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Unexpected error fetching {competitorUrl}: {ex.Message}");
+                    break; // don't retry non-HTTP 500 errors
                 }
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error fetching {competitorUrl}: {ex.Message}");
+            Console.WriteLine($"Fatal error in fetch routine: {ex.Message}");
         }
+
 
         return "";
     }

@@ -94,6 +94,8 @@
                     <TextBlock Name="LapNum" TextAlignment="Right" Margin="5">Lap Number:</TextBlock>
                     <TextBlock Name="LapStart" TextAlignment="Right" Margin="5">Lap Start: </TextBlock>
                     <TextBlock Name="LapTime" TextAlignment="Right" Margin="5">Lap Time: </TextBlock>
+                    <TextBlock Name="DriverName" TextAlignment="Right" Margin="5">Driver: </TextBlock>
+                    <TextBlock Name="CarName" TextAlignment="Right" Margin="5">Car: </TextBlock>
                     <TextBlock Name="MaxRPM" TextAlignment="Right" Margin="5">Max RPM: </TextBlock>
                     <TextBlock Name="MaxSpeed" TextAlignment="Right" Margin="5">Max Speed: </TextBlock>
                     <TextBlock Name="StartVolt" TextAlignment="Right" Margin="5">Starting Volt: </TextBlock>

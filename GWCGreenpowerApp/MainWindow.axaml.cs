@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
@@ -20,6 +21,8 @@ using Avalonia.Rendering;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using Path = System.IO.Path;
+using Point = Avalonia.Point;
+
 //TODO add a loading screen while analysing as takes forever
 namespace GWCGreenpowerApp
 {
@@ -324,13 +327,16 @@ namespace GWCGreenpowerApp
                             .Result!;
 
                         lap.LapTime = MathF.Round(closest.LapTime, 2).ToString();
+                        lap.Driver = closest.Name;
+                        lap.Car =  closest.Car;
                     }
+                    
                 }
                 else
                 {
                     lap.LapTime = Math.Round(lap.EstimatedTime.TotalSeconds, 2).ToString();
                 }
-
+                
                 lap.MaxRPM = lap.Data.Max(d => d.RPM ?? 0);  //Filter out stupid values maybe by checking the ones around it idk 
                 lap.MaxSpeed = lap.Data.Max(d => d.Speed ?? 0);
                 lap.MaxCurrent = lap.Data.Max(d => d.Current ?? 0);
@@ -380,6 +386,8 @@ namespace GWCGreenpowerApp
             LapNum.Text = "Lap Number: " + lapNum;
             LapStart.Text = "Start Time: " + new TimeSpan(lap.StartTime.Hour, lap.StartTime.Minute, lap.StartTime.Second);
             LapTime.Text = "Lap Time: " + lap.LapTime + "s";
+            DriverName.Text = "Matched Driver: " + lap.Driver;
+            CarName.Text = "Matched Car: " + lap.Car;
             MaxRPM.Text = "Max RPM: " + lap.MaxRPM;
             MaxSpeed.Text = "Max Speed: " + lap.MaxSpeed;
             StartVolt.Text = "Starting Volt: " + lap.StartVolt; //TODO calculate the starting voltage so voltage drop can also be calculated
@@ -460,6 +468,7 @@ namespace GWCGreenpowerApp
 
             return new DateTime();
         }
+
     }
 
     public class FileData
@@ -490,7 +499,9 @@ namespace GWCGreenpowerApp
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public TimeSpan EstimatedTime { get; set; }
-        public string LapTime { get; set; }
+        public string LapTime { get; set; } = "";
+        public string Driver { get; set; } = "";
+        public string Car { get; set; } = "";
         public float MaxSpeed { get; set; }
         public int MaxRPM { get; set; }
         public float MaxCurrent { get; set; }
@@ -499,6 +510,4 @@ namespace GWCGreenpowerApp
         public float AverageCurrent { get; set; }
         public int ID { get; set; }
     }
-    
-
 }

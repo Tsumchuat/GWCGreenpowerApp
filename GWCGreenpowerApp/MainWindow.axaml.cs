@@ -217,10 +217,12 @@ namespace GWCGreenpowerApp
             List<ResultEntry> resultEntries = new List<ResultEntry>();
             if (!String.IsNullOrEmpty(resultsURL))
             {
+                LoadingText.Text = "Getting Lap Times... \n (this may take a while)";
                 resultEntries = await ResultsMan.GetResultsAsync(resultsURL);
                 hasResultsLink = true;
             }
 
+            LoadingText.Text = "Finding Laps...";
 
             List<Lap> laps = new List<Lap>();
 
@@ -271,7 +273,6 @@ namespace GWCGreenpowerApp
                 }
             }
 
-
             List<Lap> lapsToRemove = new List<Lap>();
             int x = 0;
             foreach (Lap lap in laps)
@@ -290,6 +291,7 @@ namespace GWCGreenpowerApp
                 DateTime endTime = default;
                 bool startedLap = false;
                 bool finishedLap = false;
+                
                 for (int i = 0; i < lap.Data.Count; i++)
                 {
                     var record = lap.Data[i];
@@ -420,20 +422,19 @@ namespace GWCGreenpowerApp
             }
 
             LapNum.Text = "Lap Number: " + lapNum;
-            LapStart.Text = "Start Time: " +
-                            new TimeSpan(lap.StartTime.Hour, lap.StartTime.Minute, lap.StartTime.Second);
+            LapStart.Text = "Start Time: " + new TimeSpan(lap.StartTime.Hour, lap.StartTime.Minute, lap.StartTime.Second);
             LapTime.Text = "Lap Time: " + lap.LapTime + "s";
             DriverName.Text = "Matched Driver: " + lap.Driver;
             CarName.Text = "Matched Car: " + lap.Car;
             MaxRPM.Text = "Max RPM: " + lap.MaxRPM;
             MaxSpeed.Text = "Max Speed: " + lap.MaxSpeed;
-            StartVolt.Text =
-                "Starting Volt: " +
-                lap.StartVolt; //TODO calculate the starting voltage so voltage drop can also be calculated
+            StartVolt.Text = "Starting Volt: " + lap.StartVolt; //TODO calculate the starting voltage so voltage drop can also be calculated
             VoltDrop.Text = "Volt Drop: " + lap.VoltDrop;
             MaxCurrent.Text = "Max Current: " + lap.MaxCurrent;
             AvereageCurrent.Text = "Avg Current: " + lap.AverageCurrent;
             ID.Text = "Lap Debug ID: " + lap.ID;
+
+            AnalyseLoading.IsVisible = false;
         }
 
         private async void CustomLocation()
@@ -460,6 +461,9 @@ namespace GWCGreenpowerApp
             await analysePopup.ShowDialog(this);
 
             string resultsURL = analysePopup.url;
+            
+            AnalyseLoading.IsVisible = true;
+            LoadingText.Text = "Parsing File...";
 
             var records = new List<FileData>();
             try
@@ -476,6 +480,8 @@ namespace GWCGreenpowerApp
                 return;
             }
 
+            LoadingText.Text = "Generating Map...";
+            
             await GenerateMap(latitude, longitude, zoom);
             string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 "GWCGreenpowerApp", "GWCGreenpowermap.png");
@@ -491,7 +497,11 @@ namespace GWCGreenpowerApp
 
             MapImage.Source = new Bitmap(filePath);
             zoomBorder.ZoomTo(0.8, 640, 640);
+            
             fileLaps = await FindLaps(records, resultsURL);
+            
+            LoadingText.Text = "Plotting on the map...";
+            
             lapIndex = 0;
             DisplayLap(fileLaps[lapIndex], lapIndex + 1);
         }

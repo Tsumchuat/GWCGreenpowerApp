@@ -40,6 +40,8 @@ namespace GWCGreenpowerApp
         private int lapIndex = 0;
         private float xoffset = 640;
         private float yoffset = 640;
+        private float userXOffset = 0;
+        private float useryOffset = 0;
 
         public MainWindow()
         {
@@ -51,8 +53,24 @@ namespace GWCGreenpowerApp
             LeftButton.Click += OnLeftButton;
             RightButton.Click += OnRightButton;
 
+            xOffsetBox.TextChanged += OnxOffset;
+            yOffsetBox.TextChanged += OnyOffset;
+
             UpdateMenuLocations();
             
+        }
+
+        private void OnyOffset(object? sender, TextChangedEventArgs e)
+        {
+            float.TryParse(yOffsetBox.Text, out useryOffset);
+            if(fileLaps.Count>0) DisplayLap(fileLaps[lapIndex], lapIndex + 1);
+            
+        }
+
+        private void OnxOffset(object? sender, TextChangedEventArgs e)
+        {
+            float.TryParse(xOffsetBox.Text, out userXOffset);
+            if(fileLaps.Count>0) DisplayLap(fileLaps[lapIndex], lapIndex + 1);
         }
 
         public async void UpdateMenuLocations()
@@ -396,8 +414,8 @@ namespace GWCGreenpowerApp
                     Fill = Brushes.Red
                 };
 
-                Canvas.SetLeft(marker, point.X - 1 + xoffset);
-                Canvas.SetTop(marker, point.Y - 1 + yoffset);
+                Canvas.SetLeft(marker, point.X - 1 + xoffset + userXOffset);
+                Canvas.SetTop(marker, point.Y - 1 + yoffset + useryOffset);
                 OverlayCanvas.Children.Add(marker);
             }
 

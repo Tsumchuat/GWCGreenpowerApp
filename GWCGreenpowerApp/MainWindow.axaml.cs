@@ -52,17 +52,18 @@ namespace GWCGreenpowerApp
             RightButton.Click += OnRightButton;
 
             UpdateMenuLocations();
+            
         }
 
         public async void UpdateMenuLocations()
         {
-            List<Location> menuLocations = new List<Location>( await LocationManager.GetLocations());
+            List<Location> menuLocations = new List<Location>(await LocationManager.GetLocations());
 
             menuLocations.Add(new Location() { name = "-" });
             menuLocations.Add(new Location() { name = "Custom" });
             menuLocations.Add(new Location() { name = "-" });
             menuLocations.Add(new Location() { name = "Close" });
-            
+
             var flyout = new MenuFlyout();
 
             foreach (var location in menuLocations)
@@ -71,10 +72,10 @@ namespace GWCGreenpowerApp
                 item.Click += OnLocationPicked;
                 flyout.Items.Add(item);
             }
-            
+
             AnalyseButton.Flyout = flyout;
         }
-        
+
         private async void OnLocationPicked(object? sender, RoutedEventArgs e)
         {
             if (sender is MenuItem item)
@@ -84,6 +85,7 @@ namespace GWCGreenpowerApp
                 {
                     return;
                 }
+
                 if (locationName == "Custom")
                 {
                     CustomLocation();
@@ -94,7 +96,8 @@ namespace GWCGreenpowerApp
                     var selectedLocation = locations.Find(loc => loc.name == locationName);
                     if (selectedLocation != null)
                     {
-                        Analyse(selectedLocation.lat, selectedLocation.lon, selectedLocation.zoom, selectedLocation.lapInFile);
+                        Analyse(selectedLocation.lat, selectedLocation.lon, selectedLocation.zoom,
+                            selectedLocation.lapInFile);
                         location = selectedLocation;
                     }
                 }
@@ -103,10 +106,10 @@ namespace GWCGreenpowerApp
 
         private void OnRightButton(object? sender, RoutedEventArgs e)
         {
-            if (lapIndex < fileLaps.Count-1)
+            if (lapIndex < fileLaps.Count - 1)
             {
                 lapIndex++;
-                DisplayLap(fileLaps[lapIndex], lapIndex+1);
+                DisplayLap(fileLaps[lapIndex], lapIndex + 1);
             }
         }
 
@@ -115,7 +118,7 @@ namespace GWCGreenpowerApp
             if (lapIndex > 0)
             {
                 lapIndex--;
-                DisplayLap(fileLaps[lapIndex], lapIndex+1);
+                DisplayLap(fileLaps[lapIndex], lapIndex + 1);
             }
         }
 
@@ -140,17 +143,19 @@ namespace GWCGreenpowerApp
         {
             workingFile = FilePath.Text ?? "";
         }
-        
+
         static async Task GenerateMap(float lat, float longi, int zooms)
         {
-            string url = $"https://maps.googleapis.com/maps/api/staticmap?center={lat},{longi}&zoom={zooms}&size=640x640&maptype=satellite&scale=2&key=AIzaSyBTL-v9AZuWE66IECeZfcsbU07AAG-1FYc";
+            string url =
+                $"https://maps.googleapis.com/maps/api/staticmap?center={lat},{longi}&zoom={zooms}&size=640x640&maptype=satellite&scale=2&key=AIzaSyBTL-v9AZuWE66IECeZfcsbU07AAG-1FYc";
             using HttpResponseMessage response = await client.GetAsync(url);
             response.EnsureSuccessStatusCode();
             byte[] data = await response.Content.ReadAsByteArrayAsync();
-            string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GWCGreenpowerApp", "GWCGreenpowermap.png");
+            string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "GWCGreenpowerApp", "GWCGreenpowermap.png");
             await File.WriteAllBytesAsync(filePath, data);
         }
-        
+
         static float MapSize(int zoom)
         {
             return 256f * (float)Math.Pow(2, zoom);
@@ -171,36 +176,37 @@ namespace GWCGreenpowerApp
             float centerLat, float centerLon,
             int zoom)
         {
-            if(latn == null || lonn == null)
+            if (latn == null || lonn == null)
             {
-                return  new PointF(centerLat, centerLon);
+                return new PointF(centerLat, centerLon);
             }
+
             float lat = (float)latn!;
             float lon = (float)lonn!;
-            
+
             var point = LatLonToWorld(lat, lon, zoom);
             var center = LatLonToWorld(centerLat, centerLon, zoom);
 
-            float px = (point.X - center.X) * 2 ; //   *2 for scale=2
-            float py = (point.Y - center.Y) * 2 ;
+            float px = (point.X - center.X) * 2; //   *2 for scale=2
+            float py = (point.Y - center.Y) * 2;
 
             return new PointF(px, py);
         }
-            
+
         public async Task<List<Lap>> FindLaps(List<FileData> records, string resultsURL)
         {
             bool hasResultsLink = false;
             List<ResultEntry> resultEntries = new List<ResultEntry>();
-            if(!String.IsNullOrEmpty(resultsURL))
+            if (!String.IsNullOrEmpty(resultsURL))
             {
-                resultEntries =  await ResultsMan.GetResultsAsync(resultsURL);
+                resultEntries = await ResultsMan.GetResultsAsync(resultsURL);
                 hasResultsLink = true;
             }
-            
-            
+
+
             List<Lap> laps = new List<Lap>();
 
-            if (!location.lapInFile)  //TODO change this to use the throttle button instead of current when implemented
+            if (!location.lapInFile) //TODO change this to use the throttle button instead of current when implemented
             {
                 bool midLap = false;
                 Lap currentLap = new Lap();
@@ -241,11 +247,12 @@ namespace GWCGreenpowerApp
                         laps.Add(currentLap);
                         currentLap = new Lap();
                     }
+
                     lastLapNumber = record.FileLap ?? 0;
                     currentLap.Data.Add(record);
                 }
             }
-            
+
 
             List<Lap> lapsToRemove = new List<Lap>();
             int x = 0;
@@ -257,7 +264,7 @@ namespace GWCGreenpowerApp
                     lapsToRemove.Add(lap);
                     continue;
                 }
-                
+
                 int gpsMoved = 0;
                 float lastLat = 0f;
                 float lastLon = 0f;
@@ -268,7 +275,7 @@ namespace GWCGreenpowerApp
                 for (int i = 0; i < lap.Data.Count; i++)
                 {
                     var record = lap.Data[i];
-                    
+
                     if (lastLat != record.Latitude || lastLon != record.Longitude)
                     {
                         gpsMoved++;
@@ -281,13 +288,15 @@ namespace GWCGreenpowerApp
                         startedLap = true;
                         startTime = ParseDateTime(record.DateTimeString, record.Miliseconds);
                     }
-                    if (startedLap && !finishedLap && record.Current < 5 && (i + 20) < lap.Data.Count && lap.Data[i+20].Current < 5 && lap.Data[i+10].Current < 5 && i > ((lap.Data.Count / 10) * 7 ))
+
+                    if (startedLap && !finishedLap && record.Current < 5 && (i + 20) < lap.Data.Count &&
+                        lap.Data[i + 20].Current < 5 && lap.Data[i + 10].Current < 5 && i > ((lap.Data.Count / 10) * 7))
                     {
                         endTime = ParseDateTime(record.DateTimeString, record.Miliseconds);
                         finishedLap = true;
                     }
                 }
-                
+
                 if (gpsMoved < 20)
                 {
                     lapsToRemove.Add(lap);
@@ -296,14 +305,21 @@ namespace GWCGreenpowerApp
 
                 lap.StartTime = startTime;
                 lap.EndTime = endTime;
-                lap.EstimatedTime = (endTime - startTime) - new TimeSpan(0, 0, 0, 0, 900); //subtract time to account for human delay after crossing the line
+                lap.EstimatedTime =
+                    (endTime - startTime) -
+                    new TimeSpan(0, 0, 0, 0, 900); //subtract time to account for human delay after crossing the line
                 if (location.lapInFile)
                 {
-                    lap.EstimatedTime = (endTime - startTime); // redo the estimated time without subtracting if they laps are in the file
-                    lap.LapTime = Math.Round(lap.EstimatedTime.TotalSeconds, 2).ToString(); //TODO fetch speedhive for greenpower and match if u cba
+                    lap.EstimatedTime =
+                        (endTime -
+                         startTime); // redo the estimated time without subtracting if they laps are in the file
+                    lap.LapTime =
+                        Math.Round(lap.EstimatedTime.TotalSeconds, 2)
+                            .ToString(); //TODO fetch speedhive for greenpower and match if u cba
                 }
-                else if (hasResultsLink)  //TODO see what happens if no results are found in the timeframe  
-                { //writen by ai i dont fully get to sorry future me
+                else if (hasResultsLink) //TODO see what happens if no results are found in the timeframe  
+                {
+                    //writen by ai i dont fully get to sorry future me
                     var filtered = resultEntries
                         .Select(r =>
                         {
@@ -313,9 +329,10 @@ namespace GWCGreenpowerApp
                                 var startDateTime = lap.StartTime.Date + startTimeSpan;
                                 return (Result: r, Start: startDateTime);
                             }
+
                             return (Result: (ResultEntry?)null, Start: DateTime.MinValue);
                         })
-                        .Where(x => x.Result != null 
+                        .Where(x => x.Result != null
                                     && Math.Abs((x.Start - lap.StartTime).TotalMinutes) <= 3)
                         .ToList();
 
@@ -328,21 +345,22 @@ namespace GWCGreenpowerApp
 
                         lap.LapTime = MathF.Round(closest.LapTime, 2).ToString();
                         lap.Driver = closest.Name;
-                        lap.Car =  closest.Car;
+                        lap.Car = closest.Car;
                     }
-                    
+
                 }
                 else
                 {
                     lap.LapTime = Math.Round(lap.EstimatedTime.TotalSeconds, 2).ToString();
                 }
-                
-                lap.MaxRPM = lap.Data.Max(d => d.RPM ?? 0);  //Filter out stupid values maybe by checking the ones around it idk 
+
+                lap.MaxRPM = lap.Data.Max(d => d.RPM ?? 0); //Filter out stupid values maybe by checking the ones around it idk 
                 lap.MaxSpeed = lap.Data.Max(d => d.Speed ?? 0);
                 lap.MaxCurrent = lap.Data.Max(d => d.Current ?? 0);
                 var filteredx = lap.Data.Where(n => n.Current.HasValue && n.Current.Value != 0);
-                lap.AverageCurrent = filteredx.Any() 
-                    ? MathF.Round(filteredx.Average(n => n.Current.Value), 2) : 0f;
+                lap.AverageCurrent = filteredx.Any()
+                    ? MathF.Round(filteredx.Average(n => n.Current.Value), 2)
+                    : 0f;
 
                 lap.ID = x;
 
@@ -355,7 +373,7 @@ namespace GWCGreenpowerApp
             {
                 laps.Remove(lap);
             }
-            
+
             return laps;
         }
 
@@ -376,30 +394,30 @@ namespace GWCGreenpowerApp
                     Width = 2,
                     Height = 2,
                     Fill = Brushes.Red
-                };                 
-                
+                };
+
                 Canvas.SetLeft(marker, point.X - 1 + xoffset);
                 Canvas.SetTop(marker, point.Y - 1 + yoffset);
                 OverlayCanvas.Children.Add(marker);
             }
 
             LapNum.Text = "Lap Number: " + lapNum;
-            LapStart.Text = "Start Time: " + new TimeSpan(lap.StartTime.Hour, lap.StartTime.Minute, lap.StartTime.Second);
+            LapStart.Text = "Start Time: " +
+                            new TimeSpan(lap.StartTime.Hour, lap.StartTime.Minute, lap.StartTime.Second);
             LapTime.Text = "Lap Time: " + lap.LapTime + "s";
             DriverName.Text = "Matched Driver: " + lap.Driver;
             CarName.Text = "Matched Car: " + lap.Car;
             MaxRPM.Text = "Max RPM: " + lap.MaxRPM;
             MaxSpeed.Text = "Max Speed: " + lap.MaxSpeed;
-            StartVolt.Text = "Starting Volt: " + lap.StartVolt; //TODO calculate the starting voltage so voltage drop can also be calculated
+            StartVolt.Text =
+                "Starting Volt: " +
+                lap.StartVolt; //TODO calculate the starting voltage so voltage drop can also be calculated
             VoltDrop.Text = "Volt Drop: " + lap.VoltDrop;
             MaxCurrent.Text = "Max Current: " + lap.MaxCurrent;
             AvereageCurrent.Text = "Avg Current: " + lap.AverageCurrent;
             ID.Text = "Lap Debug ID: " + lap.ID;
-
         }
 
-        
-        
         private async void CustomLocation()
         {
             var customWindow = new Custom(this);
@@ -424,7 +442,7 @@ namespace GWCGreenpowerApp
             await analysePopup.ShowDialog(this);
 
             string resultsURL = analysePopup.url;
-            
+
             var records = new List<FileData>();
             try
             {
@@ -441,9 +459,10 @@ namespace GWCGreenpowerApp
             }
 
             await GenerateMap(latitude, longitude, zoom);
-            string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GWCGreenpowerApp", "GWCGreenpowermap.png");
+            string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "GWCGreenpowerApp", "GWCGreenpowermap.png");
 
-            MapImage.Source = new Bitmap(filePath);
+            
             if (!File.Exists(filePath))
             {
                 await MessageBoxManager
@@ -451,12 +470,14 @@ namespace GWCGreenpowerApp
                     .ShowAsync();
                 return;
             }
-            
+
+            MapImage.Source = new Bitmap(filePath);
+            zoomBorder.ZoomTo(0.8, 640, 640);
             fileLaps = await FindLaps(records, resultsURL);
             lapIndex = 0;
-            DisplayLap(fileLaps[lapIndex], lapIndex+1);
+            DisplayLap(fileLaps[lapIndex], lapIndex + 1);
         }
-        
+
         public DateTime ParseDateTime(string dateTimeString, string miliseconds)
         {
             if (DateTime.TryParse(dateTimeString, out var baseTime))
@@ -469,45 +490,54 @@ namespace GWCGreenpowerApp
             return new DateTime();
         }
 
-    }
 
-    public class FileData
-    {
-        public string? BluetoothConnected { get; set; }
-        [CsvHelper.Configuration.Attributes.Name("DateTime (date)")]
-        public string? DateTimeString { get; set; }
-        [CsvHelper.Configuration.Attributes.Name("DateTime (ms)")]
-        public string? Miliseconds { get; set; }
-        [CsvHelper.Configuration.Attributes.Name("GPS latitude (°)")]
-        public float? Latitude { get; set; }
-        [CsvHelper.Configuration.Attributes.Name("GPS longitude (°)")]
-        public float? Longitude { get; set; }
-        [CsvHelper.Configuration.Attributes.Name("Current (A)")]
-        public float? Current { get; set; }
-        [CsvHelper.Configuration.Attributes.Name("Motor speed (RPM)")]
-        public int? RPM { get; set; }
-        [CsvHelper.Configuration.Attributes.Name("Speed (mph)")]
-        public float? Speed { get; set; }  
-        [CsvHelper.Configuration.Attributes.Name("Lap")]
-        public int? FileLap { get; set; }
-    }
 
-    public class Lap
-    {
-        //TODO calculate lap statistics dynamicaly for better code but a variable isnt that bad forever like just leave it why bother cause i know later you is fucking lazy
-        public List<FileData> Data { get; set; } = new List<FileData>();
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
-        public TimeSpan EstimatedTime { get; set; }
-        public string LapTime { get; set; } = "";
-        public string Driver { get; set; } = "";
-        public string Car { get; set; } = "";
-        public float MaxSpeed { get; set; }
-        public int MaxRPM { get; set; }
-        public float MaxCurrent { get; set; }
-        public float StartVolt { get; set; }
-        public float VoltDrop { get; set; }
-        public float AverageCurrent { get; set; }
-        public int ID { get; set; }
+        public class FileData
+        {
+            public string? BluetoothConnected { get; set; }
+
+            [CsvHelper.Configuration.Attributes.Name("DateTime (date)")]
+            public string? DateTimeString { get; set; }
+
+            [CsvHelper.Configuration.Attributes.Name("DateTime (ms)")]
+            public string? Miliseconds { get; set; }
+
+            [CsvHelper.Configuration.Attributes.Name("GPS latitude (°)")]
+            public float? Latitude { get; set; }
+
+            [CsvHelper.Configuration.Attributes.Name("GPS longitude (°)")]
+            public float? Longitude { get; set; }
+
+            [CsvHelper.Configuration.Attributes.Name("Current (A)")]
+            public float? Current { get; set; }
+
+            [CsvHelper.Configuration.Attributes.Name("Motor speed (RPM)")]
+            public int? RPM { get; set; }
+
+            [CsvHelper.Configuration.Attributes.Name("Speed (mph)")]
+            public float? Speed { get; set; }
+
+            [CsvHelper.Configuration.Attributes.Name("Lap")]
+            public int? FileLap { get; set; }
+        }
+
+        public class Lap
+        {
+            //TODO calculate lap statistics dynamicaly for better code but a variable isnt that bad forever like just leave it why bother cause i know later you is fucking lazy
+            public List<FileData> Data { get; set; } = new List<FileData>();
+            public DateTime StartTime { get; set; }
+            public DateTime EndTime { get; set; }
+            public TimeSpan EstimatedTime { get; set; }
+            public string LapTime { get; set; } = "";
+            public string Driver { get; set; } = "";
+            public string Car { get; set; } = "";
+            public float MaxSpeed { get; set; }
+            public int MaxRPM { get; set; }
+            public float MaxCurrent { get; set; }
+            public float StartVolt { get; set; }
+            public float VoltDrop { get; set; }
+            public float AverageCurrent { get; set; }
+            public int ID { get; set; }
+        }
     }
 }

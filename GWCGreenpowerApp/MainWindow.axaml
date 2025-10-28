@@ -4,8 +4,8 @@
         x:Class="GWCGreenpowerApp.MainWindow"
         x:CompileBindings="False"
         Title="GWCGreenpowerApp"
-        Width="1280"
-        Height="720">
+        Width="1600"
+        Height="1000">
 
     <Border Padding="10">
         <Grid ColumnDefinitions="0.2*,Auto,0.8*">
@@ -25,27 +25,26 @@
                           Cursor="SizeWestEast"/>
             
             <!-- Middle row: Map display -->
-            <ScrollViewer Grid.Row="0" Grid.Column="2" Margin="10"
-                          VerticalScrollBarVisibility="Auto"
-                          HorizontalScrollBarVisibility="Auto">
-                <ZoomBorder Name="ZoomBorder" Stretch="None" ZoomSpeed="1.2"
+                    <ZoomBorder Name="zoomBorder" Stretch="None" ZoomSpeed="1.2"
                                 ClipToBounds="True" Focusable="True"
-                                VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                    <Viewbox Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <Grid>
-                            <!-- Image -->
-                            <Image x:Name="MapImage"
-                                   Stretch="None" />
+                                VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                                Grid.Column="2" Grid.Row="0"
+                                EnablePan="True" EnableZoom="True"
+                                PanButton="Left" >
+                        <Viewbox Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" Width="1280" Height="1280" >
+                            <Grid>
+                                <!-- Image -->
+                                <Image x:Name="MapImage"
+                                       Stretch="None" Width="1280" Height="1280"/>
 
-                            <!-- Overlay Canvas -->
-                            <Canvas x:Name="OverlayCanvas"
-                                    Width="{Binding #MapImage.Source.Size.Width}" 
-                                    Height="{Binding #MapImage.Source.Size.Height}"
-                                    IsHitTestVisible="False"/>
-                        </Grid>
-                    </Viewbox>
-                </ZoomBorder> 
-            </ScrollViewer>
+                                <!-- Overlay Canvas -->
+                                <Canvas x:Name="OverlayCanvas"
+                                        Width="1280" 
+                                        Height="1280"
+                                        IsHitTestVisible="False"/>
+                            </Grid>
+                        </Viewbox>
+                    </ZoomBorder> 
             <Button Margin="10 0 0 0" Name="LeftButton" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center" Height="30" Width="30">
                 <PathIcon Data="m480-320 56-56-64-64h168v-80H472l64-64-56-56-160 160 160 160Zm0 240q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" Foreground="{DynamicResource ThemeForegroundBrush}" />
             </Button>
@@ -81,6 +80,14 @@
                         <MenuFlyout/>
                     </Button.Flyout>
                 </Button>
+            </Grid>
+            
+            <Grid Grid.Column="0" Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>                
+                
             </Grid>
             
             <!-- Left Column -->

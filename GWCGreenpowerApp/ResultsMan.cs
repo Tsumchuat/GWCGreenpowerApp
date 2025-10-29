@@ -10,17 +10,9 @@ using MsBox.Avalonia.Enums;
 
 namespace GWCGreenpowerApp
 {
-    public class ResultEntry
-    {
-        public string Name { get; set; } = "";
-        public string Car { get; set; } = "";
-        public float LapTime { get; set; } = 0f;
-        public  string StartTime { get; set; } = "";
-    }
-
     public static class ResultsMan
 {
-    public static async Task<List<ResultEntry>> GetResultsAsync(string url)
+    public static async Task<List<ResultEntry>> GetResultsAsync(string url) //TODO save to a file if allreaady fetched once to save the http requests and stop getting banned from resultsman
     {
         var results = new List<ResultEntry>();
         

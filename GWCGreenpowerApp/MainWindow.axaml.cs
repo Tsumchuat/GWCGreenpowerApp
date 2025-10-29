@@ -23,7 +23,7 @@ using MsBox.Avalonia.Enums;
 using Path = System.IO.Path;
 using Point = Avalonia.Point;
 
-//TODO add a loading screen while analysing as takes forever
+//TODO add a fancy loading screen but not high priority there is way more important stuff
 namespace GWCGreenpowerApp
 {
     public partial class MainWindow : Window
@@ -399,6 +399,7 @@ namespace GWCGreenpowerApp
 
         void DisplayLap(Lap lap, int lapNum)
         {
+            PointF? oldPoint = null;
             OverlayCanvas.Children.Clear();
             foreach (FileData record in lap.Data)
             {
@@ -408,17 +409,37 @@ namespace GWCGreenpowerApp
                     latitude,
                     longitude,
                     zoom);
-
+                
                 var marker = new Ellipse
                 {
-                    Width = 2,
-                    Height = 2,
+                    Width = 4,
+                    Height = 4,
                     Fill = Brushes.Red
                 };
 
-                Canvas.SetLeft(marker, point.X - 1 + xoffset + userXOffset);
-                Canvas.SetTop(marker, point.Y - 1 + yoffset + useryOffset);
+                Canvas.SetLeft(marker, point.X - marker.Width/2 + xoffset + userXOffset);
+                Canvas.SetTop(marker, point.Y - marker.Height/2 + yoffset + useryOffset);
                 OverlayCanvas.Children.Add(marker);
+
+                if (oldPoint == null)
+                {
+                    oldPoint = point; 
+                    continue;
+                } 
+
+                var line = new Line
+                {
+                    Stroke = Brushes.Green,
+                    StrokeThickness = 3,
+                    StartPoint = new Avalonia.Point(oldPoint.Value.X, oldPoint.Value.Y),
+                    EndPoint = new Avalonia.Point(point.X, point.Y)
+                };
+        
+                Canvas.SetLeft(line, xoffset + userXOffset);
+                Canvas.SetTop(line, yoffset + useryOffset);
+                OverlayCanvas.Children.Add(line);
+                
+                oldPoint = point;
             }
 
             LapNum.Text = "Lap Number: " + lapNum;

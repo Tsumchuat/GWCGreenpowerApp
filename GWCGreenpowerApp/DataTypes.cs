@@ -60,4 +60,19 @@ public class Lap
     public int ID { get; set; }
 }
 
+public class Location
+{
+    public string name { get; set; }
+    public float lat { get; set; }
+    public float lon { get; set; }
+    public int zoom { get; set; }
+    public bool lapInFile { get; set; }
+}
+
+public class SavedResult
+{
+    public string url { get; set; }
+    public List<ResultEntry> results { get; set; }
+}
+
 

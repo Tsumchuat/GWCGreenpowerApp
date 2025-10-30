@@ -102,24 +102,4 @@ public class LocationManager
         }
 
     }
-    
-    /*
-    public static Location GetLocationString(string name)
-    {
-        throw new NotImplementedException();
-    }
-    
-    public static Location GetLocationIndex(int index)
-    {
-        throw new NotImplementedException();
-    } */
-}
-
-public class Location
-{
-    public string name { get; set; }
-    public float lat { get; set; }
-    public float lon { get; set; }
-    public int zoom { get; set; }
-    public bool lapInFile { get; set; }
 }

@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using MsBox.Avalonia;
@@ -15,6 +17,14 @@ namespace GWCGreenpowerApp
     public static async Task<List<ResultEntry>> GetResultsAsync(string url) //TODO save to a file if allreaady fetched once to save the http requests and stop getting banned from resultsman
     {
         var results = new List<ResultEntry>();
+
+        results = await GetResultsFromFile(url);
+        if (results.Count > 0)
+        {
+            return results;
+        }
+
+        results = new List<ResultEntry>();
         
         var web = new HtmlWeb();
         HtmlDocument page = null;
@@ -66,9 +76,12 @@ namespace GWCGreenpowerApp
                 StartTime = await GetStartTimeAsync(new HttpClient(), link, lapTime)
                 });
         }
-        
-        
 
+        if (results.Count > 0)
+        {
+            SaveResults(url, results);
+        }
+        
         return results;
     }
 
@@ -140,6 +153,90 @@ namespace GWCGreenpowerApp
 
 
         return "";
+    }
+    
+    public static async void SaveResults(string url, List<ResultEntry> results)
+    {
+        List<SavedResult> savedResults = await GetAllResultsFromFile(); 
+        
+        SavedResult newResult = new SavedResult
+        {
+            url = url,
+            results = results,
+        };
+        
+        savedResults.Add(newResult);
+        
+        string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GWCGreenpowerApp");
+
+        Directory.CreateDirectory(folder);
+
+        string filePath = Path.Combine(folder, "results.json");
+        try
+        {
+            await using FileStream stream = File.Create(filePath);
+            await JsonSerializer.SerializeAsync(stream, savedResults);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving results: {ex.Message}");
+            await MessageBoxManager
+                .GetMessageBoxStandard("Error Saving results for future use", ex.Message, ButtonEnum.Ok)
+                .ShowAsync();
+        }
+    }
+    public async static Task<List<ResultEntry>>? GetResultsFromFile(string url)
+    {
+        List<SavedResult> results = await  GetAllResultsFromFile();
+        
+        foreach (SavedResult result in results)
+        {
+            if (result.url == url)
+            {
+                return result.results;
+            }
+        }
+
+        return new List<ResultEntry>();
+    }
+
+    public async static Task<List<SavedResult>> GetAllResultsFromFile()
+    {
+        string folder = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "GWCGreenpowerApp"
+        );
+        string filePath = Path.Combine(folder, "results.json");
+
+        List<SavedResult> results = new();
+
+        if (File.Exists(filePath))
+        {
+            await using FileStream stream = File.OpenRead(filePath);
+            try
+            {
+                results = await JsonSerializer.DeserializeAsync<List<SavedResult>>(stream);
+            }
+            catch (Exception ex)
+            {
+                await MessageBoxManager
+                    .GetMessageBoxStandard("Error Loading results from file", ex.Message, ButtonEnum.Ok)
+                    .ShowAsync();
+            }
+
+            if (results is not null)
+            {
+                return results;
+            }
+            else
+            {
+                return new List<SavedResult>();
+            }
+        }
+        else
+        {
+            return new List<SavedResult>();
+        }
     }
 }
 

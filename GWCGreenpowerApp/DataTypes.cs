@@ -37,6 +37,8 @@ public class FileData
 
     [CsvHelper.Configuration.Attributes.Name("Lap")]
     public int? FileLap { get; set; }
+    [CsvHelper.Configuration.Attributes.Name("Total voltage (V)")]
+    public float? Voltage { get; set; }
 }
 
 public class Lap

@@ -66,6 +66,8 @@ namespace GWCGreenpowerApp
                 StartTime = await GetStartTimeAsync(new HttpClient(), link, lapTime)
                 });
         }
+        
+        
 
         return results;
     }

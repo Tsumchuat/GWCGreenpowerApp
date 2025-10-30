@@ -383,9 +383,9 @@ namespace GWCGreenpowerApp
                     : 0f;
 
                 lap.ID = x;
-
-                //   TODO  lap.StartVolt not implemented
-
+                
+                float tempvoltdiv3 = (lap.Data[3].Voltage ?? 0) + (lap.Data[4].Voltage ?? 0) + (lap.Data[5].Voltage ?? 0);
+                lap.StartVolt = tempvoltdiv3 / 3;
 
             }
 
@@ -449,7 +449,7 @@ namespace GWCGreenpowerApp
             CarName.Text = "Matched Car: " + lap.Car;
             MaxRPM.Text = "Max RPM: " + lap.MaxRPM;
             MaxSpeed.Text = "Max Speed: " + lap.MaxSpeed;
-            StartVolt.Text = "Starting Volt: " + lap.StartVolt; //TODO calculate the starting voltage so voltage drop can also be calculated
+            StartVolt.Text = "Starting Volt: " + MathF.Round(lap.StartVolt, 2);
             VoltDrop.Text = "Volt Drop: " + lap.VoltDrop;
             MaxCurrent.Text = "Max Current: " + lap.MaxCurrent;
             AvereageCurrent.Text = "Avg Current: " + lap.AverageCurrent;

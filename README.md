@@ -5,4 +5,6 @@ It is under very active development, so expect lots of bugs and missing function
 Current Features:
  - lap by lap map plotting
  - max and average of data points per lap
+ - estimate lap time
+ - scrape results times from results man 
  - more to come soon

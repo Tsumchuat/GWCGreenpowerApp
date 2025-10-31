@@ -9,7 +9,7 @@
 
         <Grid>
             <Border Padding="10">
-        <Grid ColumnDefinitions="0.2*,Auto,0.8*">
+        <Grid ColumnDefinitions="0.3*,Auto,0.9*">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="40"/>
@@ -88,28 +88,64 @@
                 <TextBox Grid.Column="1" Margin="10" Name="yOffsetBox" Watermark="Y offset"></TextBox>
             </Grid>
             
-            <!-- Left Column -->
-            <ScrollViewer Grid.Row="0" Grid.Column="0" VerticalScrollBarVisibility="Auto" Margin="10 30 10 10">
-                <ItemsControl x:Name="DynamicElements">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Orientation="Vertical"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <TextBlock Name="LapNum" TextAlignment="Right" Margin="5">Lap Number:</TextBlock>
-                    <TextBlock Name="LapStart" TextAlignment="Right" Margin="5">Lap Start: </TextBlock>
-                    <TextBlock Name="LapTime" TextAlignment="Right" Margin="5">Lap Time: </TextBlock>
-                    <TextBlock Name="DriverName" TextAlignment="Right" Margin="5">Driver: </TextBlock>
-                    <TextBlock Name="CarName" TextAlignment="Right" Margin="5">Car: </TextBlock>
-                    <TextBlock Name="MaxRPM" TextAlignment="Right" Margin="5">Max RPM: </TextBlock>
-                    <TextBlock Name="MaxSpeed" TextAlignment="Right" Margin="5">Max Speed: </TextBlock>
-                    <TextBlock Name="StartVolt" TextAlignment="Right" Margin="5">Starting Volt: </TextBlock>
-                    <TextBlock Name="VoltDrop" TextAlignment="Right" Margin="5">Voltage Drop: </TextBlock>
-                    <TextBlock Name="MaxCurrent" TextAlignment="Right" Margin="5">Max Current: </TextBlock>
-                    <TextBlock Name="AvereageCurrent" TextAlignment="Right" Margin="5">Avg Current: </TextBlock>
-                    <TextBlock Name="ID" TextAlignment="Right" Margin="5">Lap Debug ID: </TextBlock>
-                </ItemsControl>
-            </ScrollViewer>
+            <TabControl Grid.Row="0" Grid.Column="0" TabStripPlacement="Left" Name="AnalyseTabs">
+                <TabItem Header="Stats" FontSize="15">
+                    <ScrollViewer Grid.Row="0" Grid.Column="0" VerticalScrollBarVisibility="Auto" Margin="10 10 10 10">
+                        <ItemsControl x:Name="DynamicElements">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Vertical"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <TextBlock Name="LapNum" TextAlignment="Right" Margin="5">Lap Number:</TextBlock>
+                            <TextBlock Name="LapStart" TextAlignment="Right" Margin="5">Lap Start: </TextBlock>
+                            <TextBlock Name="LapTime" TextAlignment="Right" Margin="5">Lap Time: </TextBlock>
+                            <TextBlock Name="DriverName" TextAlignment="Right" Margin="5">Driver: </TextBlock>
+                            <TextBlock Name="CarName" TextAlignment="Right" Margin="5">Car: </TextBlock>
+                            <TextBlock Name="MaxRPM" TextAlignment="Right" Margin="5">Max RPM: </TextBlock>
+                            <TextBlock Name="MaxSpeed" TextAlignment="Right" Margin="5">Max Speed: </TextBlock>
+                            <TextBlock Name="StartVolt" TextAlignment="Right" Margin="5">Starting Volt: </TextBlock>
+                            <TextBlock Name="VoltDrop" TextAlignment="Right" Margin="5">Voltage Drop: </TextBlock>
+                            <TextBlock Name="MaxCurrent" TextAlignment="Right" Margin="5">Max Current: </TextBlock>
+                            <TextBlock Name="AvereageCurrent" TextAlignment="Right" Margin="5">Avg Current: </TextBlock>
+                            <TextBlock Name="ID" TextAlignment="Right" Margin="5">Lap Debug ID: </TextBlock>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Header="Compare" FontSize="15">
+                    <ScrollViewer>
+                        <ItemsControl>
+                            <Button Grid.Column="2"
+                                    x:Name="LapsDropdown"
+                                    Content="Laps"
+                                    HorizontalAlignment="Stretch" Margin="0 5 0 5">
+                                <Button.Flyout>
+                                    <MenuFlyout/>
+                                </Button.Flyout>
+                            </Button>
+                            <TextBlock>Filters</TextBlock>
+                            <Button Grid.Column="2"
+                                    x:Name="NameFilter"
+                                    Content="Names"
+                                    HorizontalAlignment="Stretch" Margin="0 5 0 5">
+                                <Button.Flyout>
+                                    <MenuFlyout/>
+                                </Button.Flyout>
+                            </Button>
+                            <Button Grid.Column="2"
+                                    x:Name="CarFilter"
+                                    Content="Cars"
+                                    HorizontalAlignment="Stretch" Margin="0 5 0 5">
+                                <Button.Flyout>
+                                    <MenuFlyout/>
+                                </Button.Flyout>
+                            </Button>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
+
+
         </Grid>
             </Border>
             <Border Name="AnalyseLoading"

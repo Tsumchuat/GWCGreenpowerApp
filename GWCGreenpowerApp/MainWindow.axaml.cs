@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.InteropServices.ComTypes;
+using System.Security;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -43,6 +44,8 @@ namespace GWCGreenpowerApp
         private float userXOffset = 0;
         private float useryOffset = 0;
 
+        private List<Lap> currentlyDisplayed = new List<Lap>();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -56,21 +59,49 @@ namespace GWCGreenpowerApp
             xOffsetBox.TextChanged += OnxOffset;
             yOffsetBox.TextChanged += OnyOffset;
 
+            AnalyseTabs.SelectionChanged += OnTabChanged;
+
             UpdateMenuLocations();
             
+        }
+
+        private void OnTabChanged(object? sender, SelectionChangedEventArgs e) //TODO fix changing the offsets just displays the other tabs lap IMPORTANT proably just make sure when changed it redraws currently selected not lapindex
+        {
+            if (sender is TabControl tab && tab.SelectedItem is TabItem selectedTab)
+            {
+                if (selectedTab.Header == "Compare")
+                {
+                    LeftButton.IsEnabled = false;
+                    RightButton.IsEnabled = false;
+                    LeftButton.IsVisible = false;
+                    RightButton.IsVisible = false;
+                    OverlayCanvas.Children.Clear();
+                    currentlyDisplayed = new List<Lap>();
+                }
+                else
+                {
+                    LeftButton.IsEnabled = true;
+                    RightButton.IsEnabled = true;
+                    LeftButton.IsVisible = true;
+                    RightButton.IsVisible = true;
+                    lapIndex = 0;
+                    if (fileLaps.Count < 1) return;
+                    DisplayLap(fileLaps[lapIndex]);
+                }
+            }
         }
 
         private void OnyOffset(object? sender, TextChangedEventArgs e)
         {
             float.TryParse(yOffsetBox.Text, out useryOffset);
-            if(fileLaps.Count>0) DisplayLap(fileLaps[lapIndex], lapIndex + 1);
+            if(fileLaps.Count>0) DisplayLap(fileLaps[lapIndex]);
             
         }
 
         private void OnxOffset(object? sender, TextChangedEventArgs e)
         {
             float.TryParse(xOffsetBox.Text, out userXOffset);
-            if(fileLaps.Count>0) DisplayLap(fileLaps[lapIndex], lapIndex + 1);
+            if(fileLaps.Count>0) DisplayLap(fileLaps[lapIndex]);
         }
 
         public async void UpdateMenuLocations()
@@ -127,7 +158,7 @@ namespace GWCGreenpowerApp
             if (lapIndex < fileLaps.Count - 1)
             {
                 lapIndex++;
-                DisplayLap(fileLaps[lapIndex], lapIndex + 1);
+                DisplayLap(fileLaps[lapIndex]);
             }
         }
 
@@ -136,7 +167,7 @@ namespace GWCGreenpowerApp
             if (lapIndex > 0)
             {
                 lapIndex--;
-                DisplayLap(fileLaps[lapIndex], lapIndex + 1);
+                DisplayLap(fileLaps[lapIndex]);
             }
         }
 
@@ -394,13 +425,27 @@ namespace GWCGreenpowerApp
                 laps.Remove(lap);
             }
 
+            for (int i = 0; i < laps.Count; i++)
+            {
+                laps[i].Number = i + 1;
+            }
+
             return laps;
         }
 
-        void DisplayLap(Lap lap, int lapNum)
+        void DisplayLap(Lap lap, bool additional = false)
         {
             PointF? oldPoint = null;
-            OverlayCanvas.Children.Clear();
+            if (!additional)
+            {
+                OverlayCanvas.Children.Clear();
+                currentlyDisplayed = new List<Lap>();
+                currentlyDisplayed.Add(lap);
+            }
+            else
+            {
+                currentlyDisplayed.Add(lap);
+            }
             foreach (FileData record in lap.Data)
             {
                 var point = LatLonToPixel(
@@ -442,7 +487,7 @@ namespace GWCGreenpowerApp
                 oldPoint = point;
             }
 
-            LapNum.Text = "Lap Number: " + lapNum;
+            LapNum.Text = "Lap Number: " + lap.Number;
             LapStart.Text = "Start Time: " + new TimeSpan(lap.StartTime.Hour, lap.StartTime.Minute, lap.StartTime.Second);
             LapTime.Text = "Lap Time: " + lap.LapTime + "s";
             DriverName.Text = "Matched Driver: " + lap.Driver;
@@ -524,7 +569,47 @@ namespace GWCGreenpowerApp
             LoadingText.Text = "Plotting on the map...";
             
             lapIndex = 0;
-            DisplayLap(fileLaps[lapIndex], lapIndex + 1);
+            DisplayLap(fileLaps[lapIndex]);
+            
+            UpdateCompareDropdowns();
+        }
+
+        public void UpdateCompareDropdowns()
+        {
+            var flyout = new MenuFlyout();
+
+            for (int i = 0; i < fileLaps.Count; i++)
+            {
+                Lap lap =  fileLaps[i];
+                var item = new CheckBox() { Content = "Lap: " + (i+1).ToString() };
+                item.IsCheckedChanged += OnAdditionalLaps;
+                flyout.Items.Add(item);
+            }
+
+            LapsDropdown.Flyout = flyout;
+        }
+
+        private void OnAdditionalLaps(object? sender, RoutedEventArgs e)
+        {
+            if (sender.GetType() == typeof(CheckBox))
+            {
+                CheckBox checkBox = (CheckBox)sender;
+                if (checkBox.IsChecked == true)
+                {
+                    DisplayLap(fileLaps[int.Parse(checkBox.Content.ToString().Split(':')[1].Trim())-1], true);
+                }
+                else
+                {
+                    currentlyDisplayed.Remove(fileLaps[int.Parse(checkBox.Content.ToString().Split(':')[1].Trim())-1]);
+                    var temp = currentlyDisplayed;
+                    currentlyDisplayed = new List<Lap>();
+                    OverlayCanvas.Children.Clear();
+                    foreach (var lap in temp)
+                    {
+                        DisplayLap(lap, true);
+                    }
+                }
+            }
         }
 
         public DateTime ParseDateTime(string dateTimeString, string miliseconds)

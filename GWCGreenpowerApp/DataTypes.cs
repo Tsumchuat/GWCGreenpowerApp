@@ -58,6 +58,7 @@ public class Lap
     public float VoltDrop { get; set; }
     public float AverageCurrent { get; set; }
     public int ID { get; set; }
+    public int Number { get; set; }
 }
 
 public class Location

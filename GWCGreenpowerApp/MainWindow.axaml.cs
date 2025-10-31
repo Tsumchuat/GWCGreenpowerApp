@@ -80,7 +80,7 @@ namespace GWCGreenpowerApp
                 }
                 else
                 {
-                    LeftButton.IsEnabled = true;
+                    LeftButton.IsEnabled = true; //prety sure i dont need to specify if i hide it but idk
                     RightButton.IsEnabled = true;
                     LeftButton.IsVisible = true;
                     RightButton.IsVisible = true;
@@ -94,14 +94,31 @@ namespace GWCGreenpowerApp
         private void OnyOffset(object? sender, TextChangedEventArgs e)
         {
             float.TryParse(yOffsetBox.Text, out useryOffset);
-            if(fileLaps.Count>0) DisplayLap(fileLaps[lapIndex]);
-            
+            if (fileLaps.Count > 0)
+            {
+                var temp = currentlyDisplayed;
+                currentlyDisplayed = new List<Lap>();
+                OverlayCanvas.Children.Clear();
+                foreach (Lap lap in temp)
+                {
+                    DisplayLap(lap, true);
+                }
+            }
         }
 
         private void OnxOffset(object? sender, TextChangedEventArgs e)
         {
             float.TryParse(xOffsetBox.Text, out userXOffset);
-            if(fileLaps.Count>0) DisplayLap(fileLaps[lapIndex]);
+            if (fileLaps.Count > 0)
+            {
+                var temp = currentlyDisplayed;
+                currentlyDisplayed = new List<Lap>();
+                OverlayCanvas.Children.Clear();
+                foreach (Lap lap in temp)
+                {
+                    DisplayLap(lap, true);
+                }
+            }
         }
 
         public async void UpdateMenuLocations()

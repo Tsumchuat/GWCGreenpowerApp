@@ -363,6 +363,12 @@ namespace GWCGreenpowerApp
                         endTime = ParseDateTime(record.DateTimeString, record.Miliseconds);
                         finishedLap = true;
                     }
+
+                    if (i == lap.Data.Count - 1 && !finishedLap)
+                    {
+                        endTime = ParseDateTime(record.DateTimeString, record.Miliseconds);
+                        finishedLap = true;
+                    }
                 }
 
                 if (gpsMoved < 20)
@@ -373,9 +379,7 @@ namespace GWCGreenpowerApp
 
                 lap.StartTime = startTime;
                 lap.EndTime = endTime;
-                lap.EstimatedTime =
-                    (endTime - startTime) -
-                    new TimeSpan(0, 0, 0, 0, 900); //subtract time to account for human delay after crossing the line
+                lap.EstimatedTime = (endTime - startTime) - new TimeSpan(0, 0, 0, 0, 900); //subtract time to account for human delay after crossing the line
                 if (location.lapInFile)
                 {
                     lap.EstimatedTime =
@@ -586,24 +590,116 @@ namespace GWCGreenpowerApp
             LoadingText.Text = "Plotting on the map...";
             
             lapIndex = 0;
-            DisplayLap(fileLaps[lapIndex]);
+            if (fileLaps.Count < 1)
+            {
+                await MessageBoxManager
+                    .GetMessageBoxStandard("Error", $"Failed to find laps in file", ButtonEnum.Ok)
+                    .ShowAsync();
+            }
+            else DisplayLap(fileLaps[lapIndex]);
             
-            UpdateCompareDropdowns();
+            UpdateCompareDropdowns(fileLaps);
+            UpdateFilterDropdowns();
+
+            AnalyseTabs.SelectedIndex = 0;
         }
 
-        public void UpdateCompareDropdowns()
+        public void UpdateCompareDropdowns(List<Lap> laps)
         {
             var flyout = new MenuFlyout();
 
-            for (int i = 0; i < fileLaps.Count; i++)
+            for (int i = 0; i < laps.Count; i++)
             {
-                Lap lap =  fileLaps[i];
-                var item = new CheckBox() { Content = "Lap: " + (i+1).ToString() };
+                Lap lap =  laps[i];
+                var item = new CheckBox() { Content = "Lap: " + lap.Number };
                 item.IsCheckedChanged += OnAdditionalLaps;
                 flyout.Items.Add(item);
             }
 
             LapsDropdown.Flyout = flyout;
+        }
+
+        public void UpdateFilterDropdowns()
+        {
+            List<string> names = new List<string>();
+            List<string> cars = new List<string>();
+            foreach (Lap lap in fileLaps)
+            {
+                if (!names.Contains(lap.Driver))
+                {
+                    names.Add(lap.Driver);
+                }
+
+                if (!cars.Contains(lap.Car))
+                {
+                    cars.Add(lap.Car);
+                }
+            }
+
+            var flyout = new MenuFlyout();
+            foreach (string name in names)
+            {
+                var item = new MenuItem() { Header = name };
+                item.Click += OnNameFilter;
+                flyout.Items.Add(item);
+            }
+            flyout.Items.Add(new Separator());
+            var allname = new MenuItem() { Header = "All" };
+            allname.Click += OnNameFilter;
+            flyout.Items.Add(allname);
+            NameFilter.Flyout =  flyout;
+            
+            flyout = new MenuFlyout();
+            foreach (string car in cars)
+            {
+                var item = new MenuItem() { Header = car };
+                item.Click += OnCarFilter;
+                flyout.Items.Add(item);
+            }
+            flyout.Items.Add(new Separator());
+            var allcar = new MenuItem() { Header = "All" };
+            allcar.Click += OnCarFilter;
+            flyout.Items.Add(allcar);
+            CarFilter.Flyout =  flyout;
+        }
+
+        private void OnCarFilter(object? sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem menuItem && menuItem.Header is string car)
+            {
+                if (car == "All")
+                {
+                    UpdateCompareDropdowns(fileLaps);
+                    CarFilter.Content = "Cars";
+                    NameFilter.Content = "Names";
+                }
+                else
+                {
+                    FilterCompareDropdownByCar(car);
+                    CarFilter.Content = car;
+                    NameFilter.Content = "Names";
+                }
+            }
+        }
+
+        private void OnNameFilter(object? sender, RoutedEventArgs e)
+        {
+            
+            if (sender is MenuItem menuItem && menuItem.Header is string name)
+            {
+                if (name == "All")
+                {
+                    UpdateCompareDropdowns(fileLaps);
+                    NameFilter.Content = "Names";
+                    CarFilter.Content = "Cars";
+                }
+                else
+                {
+                    FilterCompareDropdownByName(name);
+                    NameFilter.Content = name;
+                    CarFilter.Content = "Cars";
+                }
+            }
         }
 
         private void OnAdditionalLaps(object? sender, RoutedEventArgs e)
@@ -627,6 +723,34 @@ namespace GWCGreenpowerApp
                     }
                 }
             }
+        }
+
+        public void FilterCompareDropdownByName(string name)
+        {
+            List<Lap> laps = new List<Lap>();
+            foreach (Lap lap in fileLaps)
+            {
+                if (lap.Driver == name)
+                {
+                    laps.Add(lap);
+                }
+            }
+            UpdateCompareDropdowns(laps);
+            OverlayCanvas.Children.Clear();
+        }
+        
+        public void FilterCompareDropdownByCar(string car)
+        {
+            List<Lap> laps = new List<Lap>();
+            foreach (Lap lap in fileLaps)
+            {
+                if (lap.Car == car)
+                {
+                    laps.Add(lap);
+                }
+            }
+            UpdateCompareDropdowns(laps);
+            OverlayCanvas.Children.Clear();
         }
 
         public DateTime ParseDateTime(string dateTimeString, string miliseconds)

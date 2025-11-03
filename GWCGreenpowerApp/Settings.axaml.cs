@@ -10,4 +10,10 @@ public partial class Settings : Window
     {
         InitializeComponent();
     }
+    //lap colors
+    //reset locations
+    //reset saved resultsman
+    //permenant x and y offset
+    //change the accuracy needed to match lap times
+    
 }

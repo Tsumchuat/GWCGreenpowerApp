@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -15,7 +16,8 @@ namespace GWCGreenpowerApp;
 
 public class LocationManager
 {
-    public static MainWindow? mainWindow = (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow as MainWindow;
+    public static MainWindow? mainWindow =
+        (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow as MainWindow;
 
     public static async void SaveLocation(Location location)
     {
@@ -33,10 +35,11 @@ public class LocationManager
         {
             locations.Remove(loc);
         }
-        
+
         locations.Add(location);
-        
-        string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GWCGreenpowerApp");
+
+        string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "GWCGreenpowerApp");
 
         Directory.CreateDirectory(folder);
 
@@ -56,13 +59,14 @@ public class LocationManager
 
         mainWindow?.UpdateMenuLocations();
     }
-    
+
     public async static Task<List<Location>> GetLocations()
     {
         string folder = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "GWCGreenpowerApp"
         );
+        Directory.CreateDirectory(folder);
         string filePath = Path.Combine(folder, "locations.json");
 
         List<Location> locations = new();
@@ -89,17 +93,27 @@ public class LocationManager
             }
             else
             {
-                string temPath = Path.Combine(folder, "locations.json.default");
-                File.Copy(@temPath, @filePath, true);
+                await FetchDefaultLocations();
                 return await GetLocations();
             }
         }
         else
         {
-            string temPath = Path.Combine(folder, "locations.json.default");
-            File.Copy(@temPath, @filePath, true);
+            await FetchDefaultLocations();
             return await GetLocations();
         }
 
     }
+
+    public async static Task FetchDefaultLocations()
+    {
+        string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GWCGreenpowerApp");
+        string filePath = Path.Combine(folder, "locations.json");
+        WebClient webClient = new WebClient();
+        await webClient.DownloadFileTaskAsync(
+            "https://raw.githubusercontent.com/Tsumchuat/GWCGreenpowerApp/refs/heads/master/locations.json.default",
+            filePath);
+
+    }
+
 }

@@ -2,6 +2,7 @@ using CsvHelper;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
@@ -44,7 +45,7 @@ namespace GWCGreenpowerApp
         private float userXOffset = 0;
         private float useryOffset = 0;
 
-        private List<Lap> currentlyDisplayed = new List<Lap>();
+        public ObservableCollection<Lap> currentlyDisplayed { get; set; }= new();
 
         public MainWindow()
         {
@@ -60,9 +61,10 @@ namespace GWCGreenpowerApp
             yOffsetBox.TextChanged += OnyOffset;
 
             AnalyseTabs.SelectionChanged += OnTabChanged;
-
+            
             UpdateMenuLocations();
             
+            DataContext = this;
         }
 
         private void OnTabChanged(object? sender, SelectionChangedEventArgs e) //TODO fix changing the offsets just displays the other tabs lap IMPORTANT proably just make sure when changed it redraws currently selected not lapindex
@@ -76,7 +78,7 @@ namespace GWCGreenpowerApp
                     LeftButton.IsVisible = false;
                     RightButton.IsVisible = false;
                     OverlayCanvas.Children.Clear();
-                    currentlyDisplayed = new List<Lap>();
+                    currentlyDisplayed.Clear();;
                 }
                 else
                 {
@@ -97,7 +99,7 @@ namespace GWCGreenpowerApp
             if (fileLaps.Count > 0)
             {
                 var temp = currentlyDisplayed;
-                currentlyDisplayed = new List<Lap>();
+                currentlyDisplayed.Clear();;
                 OverlayCanvas.Children.Clear();
                 foreach (Lap lap in temp)
                 {
@@ -112,7 +114,7 @@ namespace GWCGreenpowerApp
             if (fileLaps.Count > 0)
             {
                 var temp = currentlyDisplayed;
-                currentlyDisplayed = new List<Lap>();
+                currentlyDisplayed.Clear();;
                 OverlayCanvas.Children.Clear();
                 foreach (Lap lap in temp)
                 {
@@ -456,17 +458,14 @@ namespace GWCGreenpowerApp
 
         void DisplayLap(Lap lap, bool additional = false)
         {
-            PointF? oldPoint = null;
             if (!additional)
             {
                 OverlayCanvas.Children.Clear();
-                currentlyDisplayed = new List<Lap>();
-                currentlyDisplayed.Add(lap);
-            }
-            else
-            {
-                currentlyDisplayed.Add(lap);
-            }
+                currentlyDisplayed.Clear();;
+            } 
+            currentlyDisplayed.Add(lap);
+            
+            PointF? oldPoint = null;
             foreach (FileData record in lap.Data)
             {
                 var point = LatLonToPixel(
@@ -714,14 +713,20 @@ namespace GWCGreenpowerApp
                 else
                 {
                     currentlyDisplayed.Remove(fileLaps[int.Parse(checkBox.Content.ToString().Split(':')[1].Trim())-1]);
-                    var temp = currentlyDisplayed;
-                    currentlyDisplayed = new List<Lap>();
+                    ObservableCollection<Lap> temp =  new ObservableCollection<Lap>(currentlyDisplayed);
+                    currentlyDisplayed.Clear();
                     OverlayCanvas.Children.Clear();
-                    foreach (var lap in temp)
+                    foreach (Lap lap in temp)
                     {
                         DisplayLap(lap, true);
                     }
                 }
+            }
+            var sorted = currentlyDisplayed.OrderBy(lap => lap.Number).ToList();
+            currentlyDisplayed.Clear();
+            foreach (var lap in sorted)
+            {
+                currentlyDisplayed.Add(lap);
             }
         }
 

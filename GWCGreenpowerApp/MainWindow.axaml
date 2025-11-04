@@ -140,6 +140,26 @@
                                     <MenuFlyout/>
                                 </Button.Flyout>
                             </Button>
+                            <ItemsControl ItemsSource="{Binding currentlyDisplayed}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Margin="10">
+                                            <TextBlock Text="{Binding Number, StringFormat='Lap Number: {0}'}" />
+                                            <TextBlock Text="{Binding StartTime, StringFormat='Start Time: {0:HH\\:mm\\:ss}'}" />
+                                            <TextBlock Text="{Binding LapTime, StringFormat='Lap Time: {0}s'}" />
+                                            <TextBlock Text="{Binding Driver, StringFormat='Matched Driver: {0}'}" />
+                                            <TextBlock Text="{Binding Car, StringFormat='Matched Car: {0}'}" />
+                                            <TextBlock Text="{Binding MaxRPM, StringFormat='Max RPM: {0}'}" />
+                                            <TextBlock Text="{Binding MaxSpeed, StringFormat='Max Speed: {0}'}" />
+                                            <TextBlock Text="{Binding StartVolt, StringFormat='Starting Volt: {0:F2}'}" />
+                                            <TextBlock Text="{Binding VoltDrop, StringFormat='Volt Drop: {0}'}" />
+                                            <TextBlock Text="{Binding MaxCurrent, StringFormat='Max Current: {0}'}" />
+                                            <TextBlock Text="{Binding AverageCurrent, StringFormat='Avg Current: {0}'}" />
+                                            <TextBlock Text="{Binding ID, StringFormat='Lap Debug ID: {0}'}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </ItemsControl>
                     </ScrollViewer>
                 </TabItem>

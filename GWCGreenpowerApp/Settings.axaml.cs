@@ -15,5 +15,6 @@ public partial class Settings : Window
     //reset saved resultsman
     //permenant x and y offset
     //change the accuracy needed to match lap times
+    //enable showing debug laps
     
 }

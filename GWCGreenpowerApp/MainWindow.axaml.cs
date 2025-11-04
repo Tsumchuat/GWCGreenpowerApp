@@ -30,6 +30,8 @@ namespace GWCGreenpowerApp
 {
     public partial class MainWindow : Window
     {
+        private static string mapsAPIKey = ""; //PUT YOUR MAPS API KEY HERE
+        
         public string workingFile;
         static readonly HttpClient client = new HttpClient();
         public Location location;
@@ -51,6 +53,11 @@ namespace GWCGreenpowerApp
         {
             InitializeComponent();
 
+            if (Environment.GetEnvironmentVariable("MAPS_API_KEY") != null)
+            {
+                mapsAPIKey = Environment.GetEnvironmentVariable("MAPS_API_KEY");
+            }
+            
             //ui events setup
             FileButton.Click += OnFileSelect;
             FilePath.TextChanged += OnFilePathChanged;
@@ -214,8 +221,7 @@ namespace GWCGreenpowerApp
 
         static async Task GenerateMap(float lat, float longi, int zooms)
         {
-            string url =
-                $"https://maps.googleapis.com/maps/api/staticmap?center={lat},{longi}&zoom={zooms}&size=640x640&maptype=satellite&scale=2&key=AIzaSyBTL-v9AZuWE66IECeZfcsbU07AAG-1FYc";
+            string url = $"https://maps.googleapis.com/maps/api/staticmap?center={lat},{longi}&zoom={zooms}&size=640x640&maptype=satellite&scale=2&key={mapsAPIKey}";
             using HttpResponseMessage response = await client.GetAsync(url);
             response.EnsureSuccessStatusCode();
             byte[] data = await response.Content.ReadAsByteArrayAsync();

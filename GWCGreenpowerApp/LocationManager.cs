@@ -16,8 +16,7 @@ namespace GWCGreenpowerApp;
 
 public class LocationManager
 {
-    public static MainWindow? mainWindow =
-        (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow as MainWindow;
+    public static MainWindow? mainWindow = (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow as MainWindow;
 
     public static async void SaveLocation(Location location)
     {

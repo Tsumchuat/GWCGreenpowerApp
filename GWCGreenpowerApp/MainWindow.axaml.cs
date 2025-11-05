@@ -2,28 +2,21 @@ using CsvHelper;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Runtime.InteropServices.ComTypes;
-using System.Security;
 using System.Threading.Tasks;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
-using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using Avalonia.Rendering;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using Path = System.IO.Path;
-using Point = Avalonia.Point;
 
 //TODO add a fancy loading screen but not high priority there is way more important stuff
 namespace GWCGreenpowerApp
@@ -105,7 +98,7 @@ namespace GWCGreenpowerApp
             float.TryParse(yOffsetBox.Text, out useryOffset);
             if (fileLaps.Count > 0)
             {
-                var temp = currentlyDisplayed;
+                var temp = new ObservableCollection<Lap>(currentlyDisplayed);
                 currentlyDisplayed.Clear();;
                 OverlayCanvas.Children.Clear();
                 foreach (Lap lap in temp)
@@ -120,7 +113,7 @@ namespace GWCGreenpowerApp
             float.TryParse(xOffsetBox.Text, out userXOffset);
             if (fileLaps.Count > 0)
             {
-                var temp = currentlyDisplayed;
+                var temp = new ObservableCollection<Lap>(currentlyDisplayed);
                 currentlyDisplayed.Clear();;
                 OverlayCanvas.Children.Clear();
                 foreach (Lap lap in temp)

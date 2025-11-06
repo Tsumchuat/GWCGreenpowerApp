@@ -440,7 +440,7 @@ namespace GWCGreenpowerApp
                 
                 float tempvoltdiv3 = (lap.Data[3].Voltage ?? 0) + (lap.Data[4].Voltage ?? 0) + (lap.Data[5].Voltage ?? 0);
                 lap.StartVolt = tempvoltdiv3 / 3;
-
+                
             }
 
             foreach (Lap lap in lapsToRemove)
@@ -451,6 +451,7 @@ namespace GWCGreenpowerApp
             for (int i = 0; i < laps.Count; i++)
             {
                 laps[i].Number = i + 1;
+                laps[i].Colour = GetBurshColourForLap(laps[i].Number);
             }
 
             return laps;

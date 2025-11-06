@@ -156,6 +156,12 @@
                                             <TextBlock Text="{Binding MaxCurrent, StringFormat='Max Current: {0}'}" />
                                             <TextBlock Text="{Binding AverageCurrent, StringFormat='Avg Current: {0}'}" />
                                             <TextBlock Text="{Binding ID, StringFormat='Lap Debug ID: {0}'}" />
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <TextBlock Text="Display Colour:" VerticalAlignment="Center"/>
+                                                <Border Width="16" Height="16"
+                                                        Background="{Binding Colour}"
+                                                        CornerRadius="3"/>
+                                            </StackPanel>
                                         </StackPanel>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>

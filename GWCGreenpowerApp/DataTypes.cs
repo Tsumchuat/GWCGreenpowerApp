@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Avalonia.Media;
 
 namespace GWCGreenpowerApp;
 public class ResultEntry
@@ -59,6 +60,7 @@ public class Lap
     public float AverageCurrent { get; set; }
     public int ID { get; set; }
     public int Number { get; set; }
+    public IBrush Colour { get; set; }
 }
 
 public class Location

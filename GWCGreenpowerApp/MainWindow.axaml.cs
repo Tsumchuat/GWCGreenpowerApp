@@ -16,6 +16,7 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
+using Color = Avalonia.Media.Color;
 using Path = System.IO.Path;
 
 //TODO add a fancy loading screen but not high priority there is way more important stuff
@@ -215,7 +216,7 @@ namespace GWCGreenpowerApp
         static async Task GenerateMap(float lat, float longi, int zooms)
         {
             string url = $"https://maps.googleapis.com/maps/api/staticmap?center={lat},{longi}&zoom={zooms}&size=640x640&maptype=satellite&scale=2&key={mapsAPIKey}";
-            using HttpResponseMessage response = await client.GetAsync(url);
+            using HttpResponseMessage response = await client.GetAsync(url);//TODO fix this if wifi is off
             response.EnsureSuccessStatusCode();
             byte[] data = await response.Content.ReadAsByteArrayAsync();
             string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -481,6 +482,8 @@ namespace GWCGreenpowerApp
                     Fill = Brushes.Red
                 };
 
+                marker.Fill = GetBurshColourForLap(lap.Number);
+
                 Canvas.SetLeft(marker, point.X - marker.Width/2 + xoffset + userXOffset);
                 Canvas.SetTop(marker, point.Y - marker.Height/2 + yoffset + useryOffset);
                 OverlayCanvas.Children.Add(marker);
@@ -496,8 +499,11 @@ namespace GWCGreenpowerApp
                     Stroke = Brushes.Green,
                     StrokeThickness = 3,
                     StartPoint = new Avalonia.Point(oldPoint.Value.X, oldPoint.Value.Y),
-                    EndPoint = new Avalonia.Point(point.X, point.Y)
+                    EndPoint = new Avalonia.Point(point.X, point.Y),
+                    Opacity = 0.5f
                 };
+
+                line.Stroke = GetBurshColourForLap(lap.Number);
         
                 Canvas.SetLeft(line, xoffset + userXOffset);
                 Canvas.SetTop(line, yoffset + useryOffset);
@@ -767,6 +773,16 @@ namespace GWCGreenpowerApp
             }
 
             return new DateTime();
+        }
+
+        public IBrush GetBurshColourForLap(int number)
+        {
+            var rand = new Random(number * 10000); // Seed based on lap number
+            byte r = (byte)rand.Next(100, 256); // Avoid super dark colors
+            byte g = (byte)rand.Next(100, 256);
+            byte b = (byte)rand.Next(100, 256);
+
+            return new SolidColorBrush(Color.FromRgb(r, g, b));
         }
     }
 }

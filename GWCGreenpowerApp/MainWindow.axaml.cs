@@ -14,6 +14,9 @@ using Avalonia.Controls.Shapes;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using LiveChartsCore;
+using LiveChartsCore.Defaults;
+using LiveChartsCore.SkiaSharpView;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using Color = Avalonia.Media.Color;
@@ -43,6 +46,19 @@ namespace GWCGreenpowerApp
 
         public ObservableCollection<Lap> currentlyDisplayed { get; set; }= new();
 
+        // collections the chart reads from
+        public ObservableCollection<ObservablePoint> VoltageValues = new();
+        public ObservableCollection<ObservablePoint> CurrentValues = new();
+        public ObservableCollection<ObservablePoint> SpeedValues = new();
+
+        // series objects
+        private LineSeries<ObservablePoint> VoltageSeries;
+        private LineSeries<ObservablePoint> CurrentSeries;
+        private LineSeries<ObservablePoint> SpeedSeries;
+
+        public ISeries[] Series { get; set; } //update livecharts2 to a version higher than 6.1 (the next release has a patch for a bug i had top rollback to 5.4 to solve) 
+        
+        
         public MainWindow()
         {
             InitializeComponent();
@@ -65,6 +81,41 @@ namespace GWCGreenpowerApp
             
             UpdateMenuLocations();
             
+            VoltageSeries = new LineSeries<ObservablePoint>
+            {
+                Values = VoltageValues,
+                Name = "Voltage",
+                Fill = null,
+                GeometryFill = null,
+                GeometryStroke = null,
+            };
+
+            CurrentSeries = new LineSeries<ObservablePoint>
+            {
+                Values = CurrentValues,
+                Name = "Current",
+                Fill = null,
+                GeometryFill = null,
+                GeometryStroke = null,
+            };
+
+            SpeedSeries = new LineSeries<ObservablePoint>
+            {
+                Values = SpeedValues,
+                Name = "Speed",
+                Fill = null,
+                GeometryFill = null,
+                GeometryStroke = null,
+
+            };
+
+            Series = new ISeries[]
+            {
+                VoltageSeries,
+                CurrentSeries,
+                SpeedSeries
+            };
+            
             DataContext = this;
         }
 
@@ -72,24 +123,45 @@ namespace GWCGreenpowerApp
         {
             if (sender is TabControl tab && tab.SelectedItem is TabItem selectedTab)
             {
-                if (selectedTab.Header == "Compare")
+                switch (selectedTab.Header.ToString())
                 {
-                    LeftButton.IsEnabled = false;
-                    RightButton.IsEnabled = false;
-                    LeftButton.IsVisible = false;
-                    RightButton.IsVisible = false;
-                    OverlayCanvas.Children.Clear();
-                    currentlyDisplayed.Clear();;
-                }
-                else
-                {
-                    LeftButton.IsEnabled = true; //prety sure i dont need to specify if i hide it but idk
-                    RightButton.IsEnabled = true;
-                    LeftButton.IsVisible = true;
-                    RightButton.IsVisible = true;
-                    lapIndex = 0;
-                    if (fileLaps.Count < 1) return;
-                    DisplayLap(fileLaps[lapIndex]);
+                    case "Compare":
+                        LeftButton.IsEnabled = false;
+                        RightButton.IsEnabled = false;
+                        LeftButton.IsVisible = false;
+                        RightButton.IsVisible = false;
+                        OverlayCanvas.Children.Clear();
+                        currentlyDisplayed.Clear();;
+                        zoomBorder.IsVisible = true;
+                        zoomBorder.IsEnabled = true;
+                        MainGraph.IsEnabled = false;
+                        MainGraph.IsVisible = false;
+                        break;
+                    case "Stats":
+                        LeftButton.IsEnabled = true; //prety sure i dont need to specify if i hide it but idk
+                        RightButton.IsEnabled = true;
+                        LeftButton.IsVisible = true;
+                        RightButton.IsVisible = true;
+                        lapIndex = 0;
+                        zoomBorder.IsVisible = true;
+                        zoomBorder.IsEnabled = true;
+                        MainGraph.IsEnabled = false;
+                        MainGraph.IsVisible = false;
+                        if (fileLaps.Count < 1) break;
+                        DisplayLap(fileLaps[lapIndex]);
+                        break;
+                    case "Graph":
+                        LeftButton.IsEnabled = true;
+                        RightButton.IsEnabled = true;
+                        LeftButton.IsVisible = true;
+                        RightButton.IsVisible = true;
+                        OverlayCanvas.Children.Clear();
+                        currentlyDisplayed.Clear();;
+                        zoomBorder.IsVisible = false;
+                        zoomBorder.IsEnabled = false;
+                        MainGraph.IsEnabled = true;
+                        MainGraph.IsVisible = true;
+                        break;
                 }
             }
         }
@@ -513,20 +585,30 @@ namespace GWCGreenpowerApp
                 oldPoint = point;
             }
 
-            LapNum.Text = "Lap Number: " + lap.Number;
-            LapStart.Text = "Start Time: " + new TimeSpan(lap.StartTime.Hour, lap.StartTime.Minute, lap.StartTime.Second);
-            LapTime.Text = "Lap Time: " + lap.LapTime + "s";
-            DriverName.Text = "Matched Driver: " + lap.Driver;
-            CarName.Text = "Matched Car: " + lap.Car;
-            MaxRPM.Text = "Max RPM: " + lap.MaxRPM;
-            MaxSpeed.Text = "Max Speed: " + lap.MaxSpeed;
-            StartVolt.Text = "Starting Volt: " + MathF.Round(lap.StartVolt, 2);
-            VoltDrop.Text = "Volt Drop: " + lap.VoltDrop;
-            MaxCurrent.Text = "Max Current: " + lap.MaxCurrent;
-            AvereageCurrent.Text = "Avg Current: " + lap.AverageCurrent;
-            ID.Text = "Lap Debug ID: " + lap.ID;
-
+            StatsView.UpdateLap(lap);
+            GraphView.UpdateLap(lap);
+            
             AnalyseLoading.IsVisible = false;
+            
+            if (MainGraph.IsEnabled)
+            {
+                VoltageValues.Clear();
+                CurrentValues.Clear();
+                SpeedValues.Clear();
+
+                
+                foreach (FileData fileData in lap.Data)
+                {
+                    double seconds = (ParseDateTime(fileData.DateTimeString, fileData.Miliseconds) - lap.StartTime).TotalSeconds;
+                    if (seconds < 0)
+                    {
+                        continue;
+                    }
+                    VoltageValues.Add(new ObservablePoint(seconds, fileData.Voltage));
+                    CurrentValues.Add(new ObservablePoint(seconds, fileData.Current));
+                    SpeedValues.Add(new ObservablePoint(seconds, fileData.Speed));
+                }
+            }
         }
 
         private async void CustomLocation()

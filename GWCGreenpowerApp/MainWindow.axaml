@@ -1,6 +1,10 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+        xmlns:views="using:GWCGreenpowerApp.Views"
         xmlns:local="clr-namespace:GWCGreenpowerApp"
+        xmlns:avalonia="clr-namespace:LiveChartsCore.SkiaSharpView.Avalonia;assembly=LiveChartsCore.SkiaSharpView.Avalonia"
+        xmlns:draw="clr-namespace:LiveChartsCore.SkiaSharpView.Drawing.Geometries;assembly=LiveChartsCore.SkiaSharpView"
         x:Class="GWCGreenpowerApp.MainWindow"
         x:CompileBindings="False"
         Title="GWCGreenpowerApp"
@@ -31,7 +35,7 @@
                                 VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                                 Grid.Column="2" Grid.Row="0"
                                 EnablePan="True" EnableZoom="True"
-                                PanButton="Left" >
+                                PanButton="Left">
                         <Viewbox Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" Width="1280" Height="1280" >
                             <Grid>
                                 <!-- Image -->
@@ -46,6 +50,17 @@
                             </Grid>
                         </Viewbox>
                     </ZoomBorder> 
+            
+            
+            <!-- middle row graph -->
+            <lvc:CartesianChart
+                Grid.Column="2" Grid.Row="0" 
+                Name="MainGraph" 
+                Margin="10"
+                IsEnabled="False" IsVisible="False"
+                Series = "{Binding Series}"
+                LegendPosition="Top"/>
+            
             <Button Margin="10 0 0 0" Name="LeftButton" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center" Height="30" Width="30">
                 <PathIcon Data="m480-320 56-56-64-64h168v-80H472l64-64-56-56-160 160 160 160Zm0 240q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" Foreground="{DynamicResource ThemeForegroundBrush}" />
             </Button>
@@ -91,25 +106,7 @@
             <TabControl Grid.Row="0" Grid.Column="0" TabStripPlacement="Left" Name="AnalyseTabs">
                 <TabItem Header="Stats" FontSize="15">
                     <ScrollViewer Grid.Row="0" Grid.Column="0" VerticalScrollBarVisibility="Auto" Margin="10 10 10 10">
-                        <ItemsControl x:Name="DynamicElements">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Vertical"/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <TextBlock Name="LapNum" TextAlignment="Right" Margin="5">Lap Number:</TextBlock>
-                            <TextBlock Name="LapStart" TextAlignment="Right" Margin="5">Lap Start: </TextBlock>
-                            <TextBlock Name="LapTime" TextAlignment="Right" Margin="5">Lap Time: </TextBlock>
-                            <TextBlock Name="DriverName" TextAlignment="Right" Margin="5">Driver: </TextBlock>
-                            <TextBlock Name="CarName" TextAlignment="Right" Margin="5">Car: </TextBlock>
-                            <TextBlock Name="MaxRPM" TextAlignment="Right" Margin="5">Max RPM: </TextBlock>
-                            <TextBlock Name="MaxSpeed" TextAlignment="Right" Margin="5">Max Speed: </TextBlock>
-                            <TextBlock Name="StartVolt" TextAlignment="Right" Margin="5">Starting Volt: </TextBlock>
-                            <TextBlock Name="VoltDrop" TextAlignment="Right" Margin="5">Voltage Drop: </TextBlock>
-                            <TextBlock Name="MaxCurrent" TextAlignment="Right" Margin="5">Max Current: </TextBlock>
-                            <TextBlock Name="AvereageCurrent" TextAlignment="Right" Margin="5">Avg Current: </TextBlock>
-                            <TextBlock Name="ID" TextAlignment="Right" Margin="5">Lap Debug ID: </TextBlock>
-                        </ItemsControl>
+                        <views:SingleLapStats x:Name="StatsView"/>
                     </ScrollViewer>
                 </TabItem>
                 <TabItem Header="Compare" FontSize="15">
@@ -167,6 +164,22 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                         </ItemsControl>
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem  Header="Graph" FontSize="15">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10 10 10 10">
+                        <StackPanel>
+                            <views:SingleLapStats x:Name="GraphView"/>
+                            <TextBlock HorizontalAlignment="Right" Margin="0 10 0 5">Graph Settings:</TextBlock>
+                            <CheckBox FlowDirection="RightToLeft" HorizontalAlignment="Right">Voltage</CheckBox>
+                            <CheckBox FlowDirection="RightToLeft" HorizontalAlignment="Right">Current</CheckBox>
+                            <CheckBox FlowDirection="RightToLeft" HorizontalAlignment="Right">Energy</CheckBox>
+                            <CheckBox FlowDirection="RightToLeft" HorizontalAlignment="Right">Speed</CheckBox>
+                            <CheckBox FlowDirection="RightToLeft" HorizontalAlignment="Right">RPM</CheckBox>
+                            <CheckBox FlowDirection="RightToLeft" HorizontalAlignment="Right">Averages</CheckBox>
+                            <CheckBox FlowDirection="RightToLeft" HorizontalAlignment="Right">Maximums</CheckBox>
+                            <CheckBox FlowDirection="RightToLeft" HorizontalAlignment="Right">Minimums</CheckBox>
+                        </StackPanel>
                     </ScrollViewer>
                 </TabItem>
             </TabControl>

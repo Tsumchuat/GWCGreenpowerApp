@@ -1,0 +1,28 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="GWCGreenpowerApp.Views.SingleLapStats">
+    
+    
+    <ItemsControl x:Name="DynamicElements">
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <StackPanel Orientation="Vertical"/>
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <TextBlock Name="LapNum" TextAlignment="Right" Margin="5">Lap Number:</TextBlock>
+        <TextBlock Name="LapStart" TextAlignment="Right" Margin="5">Lap Start: </TextBlock>
+        <TextBlock Name="LapTime" TextAlignment="Right" Margin="5">Lap Time: </TextBlock>
+        <TextBlock Name="DriverName" TextAlignment="Right" Margin="5">Driver: </TextBlock>
+        <TextBlock Name="CarName" TextAlignment="Right" Margin="5">Car: </TextBlock>
+        <TextBlock Name="MaxRPM" TextAlignment="Right" Margin="5">Max RPM: </TextBlock>
+        <TextBlock Name="MaxSpeed" TextAlignment="Right" Margin="5">Max Speed: </TextBlock>
+        <TextBlock Name="StartVolt" TextAlignment="Right" Margin="5">Starting Volt: </TextBlock>
+        <TextBlock Name="VoltDrop" TextAlignment="Right" Margin="5">Voltage Drop: </TextBlock>
+        <TextBlock Name="MaxCurrent" TextAlignment="Right" Margin="5">Max Current: </TextBlock>
+        <TextBlock Name="AvereageCurrent" TextAlignment="Right" Margin="5">Avg Current: </TextBlock>
+        <TextBlock Name="ID" TextAlignment="Right" Margin="5">Lap Debug ID: </TextBlock>
+    </ItemsControl>
+</UserControl>

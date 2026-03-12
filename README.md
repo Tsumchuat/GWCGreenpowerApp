@@ -7,6 +7,7 @@ Current Features:
  - estimate lap time
  - scrape results times from results man 
  - compare laps
+ - display graphs
 
 To compile from source you will need a google cloud api key with acces to the maps static api you will need to add it in the api key variable in mainwindow.axaml.cs
 

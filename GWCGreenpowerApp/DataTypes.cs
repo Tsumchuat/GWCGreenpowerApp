@@ -40,6 +40,12 @@ public class FileData
     public int? FileLap { get; set; }
     [CsvHelper.Configuration.Attributes.Name("Total voltage (V)")]
     public float? Voltage { get; set; }
+
+    public float? Power()
+    {
+        float? power = Current * Voltage;
+        return power;
+    }
 }
 
 public class Lap

@@ -14,8 +14,11 @@ using Avalonia.Controls.Shapes;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Threading;
 using LiveChartsCore;
 using LiveChartsCore.Defaults;
+using LiveChartsCore.Measure;
+using LiveChartsCore.Motion;
 using LiveChartsCore.SkiaSharpView;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
@@ -50,14 +53,31 @@ namespace GWCGreenpowerApp
         public ObservableCollection<ObservablePoint> VoltageValues = new();
         public ObservableCollection<ObservablePoint> CurrentValues = new();
         public ObservableCollection<ObservablePoint> SpeedValues = new();
+        public ObservableCollection<ObservablePoint> RPMValues = new();
 
         // series objects
         private LineSeries<ObservablePoint> VoltageSeries;
         private LineSeries<ObservablePoint> CurrentSeries;
         private LineSeries<ObservablePoint> SpeedSeries;
+        private LineSeries<ObservablePoint> RPMSeries;
 
         public ISeries[] Series { get; set; } //update livecharts2 to a version higher than 6.1 (the next release has a patch for a bug i had top rollback to 5.4 to solve) 
         
+        public Axis[] YAxes = new Axis[]
+        {
+            new Axis
+            {
+                Name = "Voltage (V)  Current (A)  Speed(mph)", 
+                MinLimit = 0,
+                MaxLimit = 32//todo make this configurage in the app
+            },
+            new Axis
+            {
+                Name = "RPM",  Position = AxisPosition.End,
+                MinLimit = 0,
+                MaxLimit = 2500
+            },
+        };
         
         public MainWindow()
         {
@@ -88,6 +108,7 @@ namespace GWCGreenpowerApp
                 Fill = null,
                 GeometryFill = null,
                 GeometryStroke = null,
+                ScalesYAt = 0
             };
 
             CurrentSeries = new LineSeries<ObservablePoint>
@@ -97,6 +118,7 @@ namespace GWCGreenpowerApp
                 Fill = null,
                 GeometryFill = null,
                 GeometryStroke = null,
+                ScalesYAt = 0
             };
 
             SpeedSeries = new LineSeries<ObservablePoint>
@@ -106,18 +128,42 @@ namespace GWCGreenpowerApp
                 Fill = null,
                 GeometryFill = null,
                 GeometryStroke = null,
+                ScalesYAt = 0
+            };
 
+            RPMSeries = new LineSeries<ObservablePoint>
+            {
+                Values = RPMValues,
+                Name = "RPM",
+                Fill = null,
+                GeometryFill = null,
+                GeometryStroke = null,
+                ScalesYAt = 1
             };
 
             Series = new ISeries[]
             {
                 VoltageSeries,
                 CurrentSeries,
-                SpeedSeries
+                SpeedSeries,
+                RPMSeries,
             };
             
             DataContext = this;
         }
+        
+        //for customising the per lap graph 
+        private void Voltage_On(object? s, RoutedEventArgs e) => VoltageSeries.IsVisible = true;
+        private void Voltage_Off(object? s, RoutedEventArgs e) => VoltageSeries.IsVisible = false;
+
+        private void Current_On(object? s, RoutedEventArgs e) => CurrentSeries.IsVisible = true;
+        private void Current_Off(object? s, RoutedEventArgs e) => CurrentSeries.IsVisible = false;
+
+        private void Speed_On(object? s, RoutedEventArgs e) => SpeedSeries.IsVisible = true;
+        private void Speed_Off(object? s, RoutedEventArgs e) => SpeedSeries.IsVisible = false;
+
+        private void RPM_On(object? s, RoutedEventArgs e) => RPMSeries.IsVisible = true;
+        private void RPM_Off(object? s, RoutedEventArgs e) => RPMSeries.IsVisible = false;
 
         private void OnTabChanged(object? sender, SelectionChangedEventArgs e) //TODO fix changing the offsets just displays the other tabs lap IMPORTANT proably just make sure when changed it redraws currently selected not lapindex
         {
@@ -135,7 +181,7 @@ namespace GWCGreenpowerApp
                         zoomBorder.IsVisible = true;
                         zoomBorder.IsEnabled = true;
                         MainGraph.IsEnabled = false;
-                        MainGraph.IsVisible = false;
+                        MainGraph.Opacity = 0;
                         break;
                     case "Stats":
                         LeftButton.IsEnabled = true; //prety sure i dont need to specify if i hide it but idk
@@ -146,7 +192,7 @@ namespace GWCGreenpowerApp
                         zoomBorder.IsVisible = true;
                         zoomBorder.IsEnabled = true;
                         MainGraph.IsEnabled = false;
-                        MainGraph.IsVisible = false;
+                        MainGraph.Opacity = 0;
                         if (fileLaps.Count < 1) break;
                         DisplayLap(fileLaps[lapIndex]);
                         break;
@@ -159,8 +205,11 @@ namespace GWCGreenpowerApp
                         currentlyDisplayed.Clear();;
                         zoomBorder.IsVisible = false;
                         zoomBorder.IsEnabled = false;
+                        MainGraph.YAxes = YAxes;
                         MainGraph.IsEnabled = true;
-                        MainGraph.IsVisible = true;
+                        MainGraph.Opacity = 1;
+                        if (fileLaps.Count < 1) break;
+                        DisplayLap(fileLaps[lapIndex]);
                         break;
                 }
             }
@@ -595,7 +644,12 @@ namespace GWCGreenpowerApp
                 VoltageValues.Clear();
                 CurrentValues.Clear();
                 SpeedValues.Clear();
-
+                RPMValues.Clear();
+                //fixes the smaller data leaving ghost points bug
+                VoltageSeries.Invalidate(MainGraph.CoreChart);
+                CurrentSeries.Invalidate(MainGraph.CoreChart);
+                SpeedSeries.Invalidate(MainGraph.CoreChart);
+                RPMSeries.Invalidate(MainGraph.CoreChart); 
                 
                 foreach (FileData fileData in lap.Data)
                 {
@@ -607,7 +661,13 @@ namespace GWCGreenpowerApp
                     VoltageValues.Add(new ObservablePoint(seconds, fileData.Voltage));
                     CurrentValues.Add(new ObservablePoint(seconds, fileData.Current));
                     SpeedValues.Add(new ObservablePoint(seconds, fileData.Speed));
+                    RPMValues.Add(new ObservablePoint(seconds, fileData.RPM)); 
                 }
+                Dispatcher.UIThread.Post(() =>
+                {
+                    foreach (var s in Series)
+                        s.Invalidate(MainGraph.CoreChart);
+                });
             }
         }
 

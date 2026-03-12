@@ -57,10 +57,10 @@
                 Grid.Column="2" Grid.Row="0" 
                 Name="MainGraph" 
                 Margin="10"
-                IsEnabled="False" IsVisible="False"
+                IsEnabled="False" Opacity="0"
                 Series = "{Binding Series}"
-                LegendPosition="Top"/>
-            
+                YAxes="{Binding YAxes}"
+                LegendPosition="Top" EasingFunction="{x:Null}" /> <!-- todo re-enable animations when the library is updated so i dont have to reinit the series every time the data changes beacuse that makes a terrible animation when they are reinit-->
             <Button Margin="10 0 0 0" Name="LeftButton" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center" Height="30" Width="30">
                 <PathIcon Data="m480-320 56-56-64-64h168v-80H472l64-64-56-56-160 160 160 160Zm0 240q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" Foreground="{DynamicResource ThemeForegroundBrush}" />
             </Button>
@@ -171,14 +171,16 @@
                         <StackPanel>
                             <views:SingleLapStats x:Name="GraphView"/>
                             <TextBlock HorizontalAlignment="Right" Margin="0 10 0 5">Graph Settings:</TextBlock>
-                            <CheckBox FlowDirection="RightToLeft" HorizontalAlignment="Right">Voltage</CheckBox>
-                            <CheckBox FlowDirection="RightToLeft" HorizontalAlignment="Right">Current</CheckBox>
-                            <CheckBox FlowDirection="RightToLeft" HorizontalAlignment="Right">Energy</CheckBox>
-                            <CheckBox FlowDirection="RightToLeft" HorizontalAlignment="Right">Speed</CheckBox>
-                            <CheckBox FlowDirection="RightToLeft" HorizontalAlignment="Right">RPM</CheckBox>
-                            <CheckBox FlowDirection="RightToLeft" HorizontalAlignment="Right">Averages</CheckBox>
-                            <CheckBox FlowDirection="RightToLeft" HorizontalAlignment="Right">Maximums</CheckBox>
-                            <CheckBox FlowDirection="RightToLeft" HorizontalAlignment="Right">Minimums</CheckBox>
+                            <CheckBox Content="Voltage" FlowDirection="RightToLeft" HorizontalAlignment="Right" IsChecked="True"
+                                      Checked="Voltage_On" Unchecked="Voltage_Off"/>
+                            <CheckBox Content="Current" FlowDirection="RightToLeft" HorizontalAlignment="Right" IsChecked="True"
+                                      Checked="Current_On" Unchecked="Current_Off"/>
+                            <CheckBox Content="Speed" FlowDirection="RightToLeft" HorizontalAlignment="Right" IsChecked="True"
+                                      Checked="Speed_On" Unchecked="Speed_Off"/>
+                            <CheckBox Content="RPM" FlowDirection="RightToLeft" HorizontalAlignment="Right" IsChecked="True"
+                                      Checked="RPM_On" Unchecked="RPM_Off"/>
+                            <!--CheckBox Content="Averages" FlowDirection="RightToLeft" HorizontalAlignment="Right" IsChecked="True"
+                                      Checked="Averages_On" Unchecked="Averages_Off"/-->
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem>

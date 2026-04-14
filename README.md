@@ -1,3 +1,5 @@
+THIS TOOL HAS BEEN ABANDONED, A NEW VERSION IS IN THE MAKING (14/4/26)
+
 This is a tool designed to break down the data from the eChook telemetry systems found on Greenpower education trust F24 cars during endurance races and especially Scottish schools racing championships sprints.
 
 It is under very active development, so expect lots of bugs and missing functionality. 
